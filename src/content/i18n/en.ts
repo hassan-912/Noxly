@@ -88,6 +88,7 @@ export const en = {
   },
   viewer: {
     railLabel: "Featured projects",
+    preview: "Interactive preview",
     counter: "{current} / {total}",
     devicesLabel: "Preview size",
     desktop: "Desktop",
@@ -100,6 +101,8 @@ export const en = {
     caseStudy: "Read the case study",
     loadLive: "Load live site",
     liveTitle: "Live preview of {name}",
+    liveLoading: "Loading the live site…",
+    livePoster: "Screenshot of {name}",
     liveFallback: "The live preview isn't available right now. You can open the site in a new tab.",
     opensNewTab: "(opens in a new tab)",
     demoLoading: "Loading demo…",

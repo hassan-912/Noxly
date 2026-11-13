@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { isLocale } from "@/lib/i18n";
+import { getProject, isLocale } from "@/lib/i18n";
+import { posterFor } from "@/lib/posters";
 import { DemoLab } from "./DemoLab";
 
 /**
@@ -16,5 +17,12 @@ export const metadata: Metadata = {
 export default async function DemoLabPage({ params }: PageProps<"/[locale]/demo-lab">) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  return <DemoLab locale={locale} />;
+  const qr = getProject("qr-studio");
+  const text = qr.text[locale];
+  return (
+    <DemoLab
+      locale={locale}
+      live={{ url: qr.liveUrl!, poster: posterFor(qr.slug), title: text.name, pitch: text.pitch }}
+    />
+  );
 }

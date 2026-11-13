@@ -26,7 +26,8 @@ test("home has every section anchor with a heading", async ({ page }) => {
   for (const id of sectionIds) {
     const section = page.locator(`section#${id}`);
     await expect(section).toHaveCount(1);
-    await expect(section.getByRole("heading")).toHaveCount(1);
+    // One section heading; a section may have sub-headings of its own (e.g. the project viewer).
+    await expect(section.getByRole("heading", { level: 2 })).toHaveCount(1);
   }
 });
 

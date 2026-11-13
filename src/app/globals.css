@@ -401,3 +401,337 @@ body {
   .mp-r1 { border-radius: calc(var(--u) * 8); }
   .mp-r2 { border-radius: calc(var(--u) * 14); }
 }
+
+/* ───────────────────────── Shared surfaces ───────────────────────── */
+
+@layer components {
+  /* GlowSurface: a soft highlight behind the content. It follows the cursor on fine pointers,
+     and shows centred on keyboard focus and while pressed on touch. No glow under reduced motion. */
+  .glow-surface {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .glow-surface::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(
+      11rem circle at var(--glow-x, 50%) var(--glow-y, 50%),
+      rgb(143 217 251 / 0.38),
+      rgb(82 90 255 / 0.1) 45%,
+      transparent 72%
+    );
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 260ms ease;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @media (hover: hover) and (pointer: fine) {
+      .glow-surface:hover::before {
+        opacity: 1;
+      }
+    }
+
+    .glow-surface:focus-visible::before,
+    .glow-surface:has(:focus-visible)::before,
+    .glow-surface:active::before {
+      opacity: 1;
+    }
+  }
+}
+
+/* ───────────────────────── Project viewer (#work) ───────────────────────── */
+
+@layer components {
+  /* Small labels: mono for Latin scripts, the text face for Arabic (mono has no Arabic glyphs). */
+  .viewer-kicker {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--color-ink-muted);
+  }
+
+  .locale-ar .viewer-kicker {
+    font-family: inherit;
+    font-size: 0.8125rem;
+  }
+
+  .locale-ar .viewer-title {
+    letter-spacing: 0;
+    line-height: 1.5;
+  }
+
+  .viewer-rail {
+    scrollbar-width: none;
+    scroll-snap-type: inline proximity;
+    scroll-padding-inline: 1.25rem;
+  }
+
+  .viewer-rail > * {
+    scroll-snap-align: start;
+  }
+
+  .viewer-rail__rule {
+    transform-origin: left;
+  }
+
+  [dir="rtl"] .viewer-rail__rule {
+    transform-origin: right;
+  }
+
+  /* The stage: frost with a little atmosphere, edge to edge on phones, a rounded panel from md. */
+  .viewer-stage {
+    position: relative;
+    overflow: clip;
+    border-block: 1px solid var(--color-mist);
+    background:
+      radial-gradient(46rem 24rem at 88% -8%, rgb(143 217 251 / 0.26), transparent 62%),
+      radial-gradient(40rem 26rem at 4% 108%, rgb(207 202 255 / 0.3), transparent 62%),
+      var(--color-frost);
+  }
+
+  @media (min-width: 48rem) {
+    .viewer-stage {
+      border: 1px solid var(--color-mist);
+      border-radius: 1.75rem;
+    }
+  }
+
+  /* Frosted control bar. */
+  .viewer-stage__bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-block-size: 3rem;
+    padding: 0.5rem 1rem;
+    border-block-end: 1px solid rgb(212 221 226 / 0.75);
+    background: rgb(255 255 255 / 0.62);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3);
+    backdrop-filter: blur(14px) saturate(1.3);
+  }
+
+  @media (min-width: 48rem) {
+    .viewer-stage__bar {
+      min-block-size: 3.5rem;
+      padding-inline: 1.25rem 0.75rem;
+    }
+  }
+
+  .device-stage {
+    display: flex;
+    justify-content: center;
+  }
+
+  .device-stage[data-animate] {
+    transition: block-size 560ms cubic-bezier(0.3, 0.7, 0.2, 1);
+  }
+
+  /* Device frame: frosted glass around a screen that is exactly as wide as the device. */
+  .device-frame {
+    --bezel: 6px;
+    --radius: 16px;
+    position: relative;
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    padding: var(--bezel);
+    border-radius: var(--radius);
+    background: rgb(255 255 255 / 0.58);
+    -webkit-backdrop-filter: blur(16px) saturate(1.3);
+    backdrop-filter: blur(16px) saturate(1.3);
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.85),
+      0 0 0 1px rgb(14 26 36 / 0.07),
+      0 1px 1px rgb(14 26 36 / 0.04),
+      0 18px 36px -20px rgb(14 26 36 / 0.2),
+      0 48px 80px -44px rgb(14 26 36 / 0.3);
+    transform-origin: top center;
+  }
+
+  .device-frame[data-device="tablet"] {
+    --bezel: 10px;
+    --radius: 28px;
+  }
+
+  .device-frame[data-device="phone"] {
+    --bezel: 9px;
+    --radius: 40px;
+  }
+
+  /* Below 768px: the phone layout at the available width, as tall as its content. */
+  .device-frame[data-fluid] {
+    --bezel: 5px;
+    --radius: 26px;
+    inline-size: 100%;
+    max-inline-size: calc(390px + 2 * var(--bezel));
+  }
+
+  .device-frame[data-animate] {
+    transition:
+      inline-size 560ms cubic-bezier(0.3, 0.7, 0.2, 1),
+      block-size 560ms cubic-bezier(0.3, 0.7, 0.2, 1),
+      transform 560ms cubic-bezier(0.3, 0.7, 0.2, 1),
+      padding 560ms cubic-bezier(0.3, 0.7, 0.2, 1),
+      border-radius 560ms cubic-bezier(0.3, 0.7, 0.2, 1);
+  }
+
+  /* A slim window bar, on the desktop frame only. */
+  .device-frame__top {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 5px;
+    block-size: 0;
+    padding-inline: 8px;
+    overflow: hidden;
+    opacity: 0;
+    transition:
+      block-size 560ms cubic-bezier(0.3, 0.7, 0.2, 1),
+      opacity 300ms ease;
+  }
+
+  .device-frame[data-device="desktop"] .device-frame__top {
+    block-size: 20px;
+    padding-block-end: 5px;
+    opacity: 1;
+  }
+
+  .device-frame__top > span {
+    inline-size: 7px;
+    block-size: 7px;
+    border-radius: 50%;
+    background: var(--color-mist);
+  }
+
+  .device-frame__screen {
+    position: relative;
+    flex: 1;
+    min-block-size: 0;
+    overflow: clip auto;
+    border-radius: calc(var(--radius) - var(--bezel));
+    background: var(--color-frost);
+    box-shadow: 0 0 0 1px rgb(212 221 226 / 0.9);
+    /* No scrollbar, so the screen is exactly as wide as the device; a fade shows there is more. */
+    scrollbar-width: none;
+    transition: border-radius 560ms cubic-bezier(0.3, 0.7, 0.2, 1);
+  }
+
+  .device-frame[data-fluid] .device-frame__screen {
+    overflow: clip;
+  }
+
+  .device-frame::after {
+    content: "";
+    position: absolute;
+    inset-inline: var(--bezel);
+    inset-block-end: var(--bezel);
+    block-size: 3.5rem;
+    border-end-start-radius: calc(var(--radius) - var(--bezel));
+    border-end-end-radius: calc(var(--radius) - var(--bezel));
+    background: linear-gradient(to top, rgb(244 247 249 / 0.96), rgb(244 247 249 / 0));
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 240ms ease;
+  }
+
+  .device-frame[data-more]::after {
+    opacity: 1;
+  }
+
+  /* Crossfade between projects: the outgoing demo is laid over the incoming one and fades. */
+  .viewer-demo--out {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  @keyframes viewer-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes viewer-out {
+    to {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .viewer-demo {
+      animation: viewer-in 280ms ease both;
+    }
+
+    .viewer-demo--out {
+      animation: viewer-out 280ms ease both;
+    }
+  }
+
+  /* ── LiveEmbed ── */
+
+  .live-embed {
+    container-type: inline-size;
+    overflow: clip;
+    margin: 0;
+    border: 1px solid var(--color-mist);
+    border-radius: 1rem;
+    background: var(--color-surface);
+  }
+
+  .live-embed__screen {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    min-block-size: 22rem;
+    max-block-size: 44rem;
+    inline-size: 100%;
+    overflow: clip;
+    background: var(--color-frost);
+  }
+
+  /* Designed fallback when there is no poster: never a blank frame. */
+  .live-embed__card {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: clamp(1.25rem, 6cqi, 3rem);
+    background:
+      radial-gradient(34rem 20rem at 92% 0%, rgb(143 217 251 / 0.45), transparent 62%),
+      radial-gradient(30rem 22rem at 0% 100%, rgb(207 202 255 / 0.5), transparent 62%),
+      radial-gradient(24rem 16rem at 70% 110%, rgb(255 211 189 / 0.45), transparent 62%),
+      var(--color-frost);
+  }
+
+  .live-embed__overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: clamp(1rem, 5cqi, 2rem);
+    background: linear-gradient(to top, rgb(14 26 36 / 0.3), rgb(14 26 36 / 0) 55%);
+  }
+
+  .live-embed__note {
+    max-inline-size: 28rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: 0.875rem;
+    background: rgb(255 255 255 / 0.92);
+    font-size: 0.875rem;
+    line-height: 1.45;
+    text-align: center;
+    color: var(--color-ink);
+    box-shadow:
+      0 1px 2px rgb(14 26 36 / 0.12),
+      0 12px 28px -14px rgb(14 26 36 / 0.35);
+  }
+}

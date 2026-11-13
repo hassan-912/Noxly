@@ -3,6 +3,7 @@
 import { Suspense, useState } from "react";
 import type { Locale } from "@/content/types";
 import { demoIds, demoRegistry } from "@/components/demos/registry";
+import { LiveEmbed } from "@/components/work/LiveEmbed";
 
 const widths = [360, 768, 1200] as const;
 
@@ -11,7 +12,13 @@ const widths = [360, 768, 1200] as const;
  * whose width is switchable, standing in for the project viewer's phone / tablet / desktop
  * frames. Developer-facing, so its few labels are not localized.
  */
-export function DemoLab({ locale }: { locale: Locale }) {
+export function DemoLab({
+  locale,
+  live,
+}: {
+  locale: Locale;
+  live: { url: string; poster: string | null; title: string; pitch: string };
+}) {
   const [width, setWidth] = useState<(typeof widths)[number]>(1200);
 
   return (
@@ -44,6 +51,14 @@ export function DemoLab({ locale }: { locale: Locale }) {
           </div>
         </section>
       ))}
+
+      {/* LiveEmbed fixture (tests/e2e/viewer.spec.ts): the one embeddable live site. */}
+      <section aria-labelledby="lab-live" className="mx-auto mt-10" style={{ inlineSize: width, maxInlineSize: "100%" }}>
+        <h2 id="lab-live" className="font-mono text-sm text-ink-muted">
+          live-embed
+        </h2>
+        <LiveEmbed {...live} locale={locale} className="mt-2" />
+      </section>
     </div>
   );
 }

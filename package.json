@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "tsx scripts/check-site-url.ts && next build",
+    "build": "tsx scripts/check-site-url.ts && tsx scripts/og.tsx && next build",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",

@@ -17,6 +17,10 @@ export const fontArabic = IBM_Plex_Sans_Arabic({
   subsets: ["arabic"],
   weight: ["400", "500", "600", "700"],
   display: "swap",
+  // No metric-adjusted Arial fallback: it covers Latin, so it would win over Geist for Latin
+  // text on Arabic pages. With it off, `var(--font-arabic), var(--font-sans)` renders Arabic
+  // in Plex and Latin (tech names, numbers) in Geist.
+  adjustFontFallback: false,
 });
 
 export const fontVariables = `${fontSans.variable} ${fontMono.variable} ${fontArabic.variable}`;

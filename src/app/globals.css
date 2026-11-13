@@ -25,6 +25,17 @@ body {
   font-family: var(--font-sans);
 }
 
+/* Arabic pages: Arabic glyphs from IBM Plex Sans Arabic, Latin (tech names, numbers) from Geist.
+   `[lang="ar"]` also covers Arabic inside other locales, e.g. "العربية" in the language menu. */
+.locale-ar body,
+[lang="ar"] {
+  font-family: var(--font-arabic), var(--font-sans), system-ui, sans-serif;
+}
+
+.locale-ar body {
+  line-height: 1.7;
+}
+
 :focus-visible {
   outline: 2px solid #525aff;
   outline-offset: 3px;

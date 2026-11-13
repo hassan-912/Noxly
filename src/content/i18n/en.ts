@@ -227,6 +227,10 @@ export const en = {
     solo: "Designed and built by me",
     shared: "Team project",
   },
+  root: {
+    title: "Choose a language",
+    noscript: "JavaScript is off, so pick your language from the list.",
+  },
   footer: {
     privacy: "This site sets no cookies and no tracking.",
     copyright: "© {year} Hassan Azab",

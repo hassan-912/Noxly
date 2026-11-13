@@ -4,7 +4,7 @@ Statically exported Next.js site (en, de, fr, ar).
 
 ## Run
 - `npm run dev` — dev server
-- `npm run build` — checks `site.url`, then exports to `out/`
+- `npm run build` — checks `site.url`, writes the per-locale share images to `public/og/` (`scripts/og.tsx`, git-ignored), then exports to `out/`
 
 ## Test
 - `npm test` — unit tests (vitest)

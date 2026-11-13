@@ -147,6 +147,32 @@ test("device radio group sets frame width: desktop ≥ 960, tablet 768, phone 39
   }
 });
 
+test("the default device is the largest that stays readable: tablet at 768px, desktop at 1440px", async ({ page }) => {
+  const group = work(page).getByRole("radiogroup", { name: v.devicesLabel });
+  const width = () => frame(page).evaluate((el) => el.clientWidth);
+  const scale = async () => (await frame(page).boundingBox())!.width / (await width());
+
+  await page.setViewportSize({ width: 768, height: 900 });
+  await openViewer(page);
+  await expect(group.getByRole("radio", { name: v.tablet })).toBeChecked();
+  await expect.poll(width).toBe(768);
+  await expect.poll(scale).toBeGreaterThan(0.8);
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openViewer(page);
+  await expect(group.getByRole("radio", { name: v.desktop })).toBeChecked();
+  await expect.poll(width).toBeGreaterThanOrEqual(960);
+  await expect.poll(scale).toBeGreaterThanOrEqual(0.85);
+
+  // Without a choice the default follows the stage; an explicit choice survives resizes.
+  await page.setViewportSize({ width: 900, height: 900 });
+  await expect(group.getByRole("radio", { name: v.tablet })).toBeChecked();
+  await group.getByRole("radio", { name: v.phone }).check();
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(group.getByRole("radio", { name: v.phone })).toBeChecked();
+  await expect.poll(width).toBe(390);
+});
+
 test("device controls are hidden below 768px viewport and frame shows phone layout", async ({ page }) => {
   for (const locale of ["en", "ar"] as const) {
     for (const viewport of [320, 360, 375, 767]) {
@@ -273,6 +299,17 @@ test.describe("LiveEmbed", () => {
     await expect(iframe).toHaveCount(1);
     await expect(iframe).toHaveAttribute("src", /^https:\/\/queue-r-code\.vercel\.app\/?$/);
     await expect(iframe).toHaveAttribute("title", v.liveTitle.replace("{name}", qr.text.en.name));
+    // Sandboxed, but the site's own features work: downloads, new-tab links, clipboard.
+    const sandbox = ((await iframe.getAttribute("sandbox")) ?? "").split(/\s+/).sort();
+    expect(sandbox).toEqual([
+      "allow-downloads",
+      "allow-forms",
+      "allow-popups",
+      "allow-popups-to-escape-sandbox",
+      "allow-same-origin",
+      "allow-scripts",
+    ]);
+    await expect(iframe).toHaveAttribute("allow", "clipboard-write");
     await expect(embed(page)).toHaveAttribute("data-state", "live");
     await expect(iframe).toBeVisible();
     await expect(page.frameLocator("[data-live-embed] iframe").getByRole("heading", { name: "QR stub" })).toBeVisible();
@@ -292,6 +329,53 @@ test.describe("LiveEmbed", () => {
     await expect(external(page)).toBeVisible();
     await expect(external(page)).toHaveAttribute("href", QR_ORIGIN);
     await expect(embed(page).locator("iframe")).toHaveCount(0);
+  });
+
+  test("LiveEmbed: keyboard: Enter loads the site and focus stays inside the embed", async ({ page }) => {
+    const focus = () =>
+      page.evaluate(() => {
+        const active = document.activeElement;
+        const root = document.querySelector("[data-live-embed]");
+        return { inside: !!active && !!root && root.contains(active), tag: active?.tagName ?? null };
+      });
+    // The site responds only when released, so the loading state can be inspected.
+    let release = () => {};
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    await page.route(`${QR_ORIGIN}/**`, async (route) => {
+      await gate;
+      await route.fulfill({ contentType: "text/html", body: "<!doctype html><title>stub</title><h1>QR stub</h1>" });
+    });
+    await page.goto("/en/demo-lab/");
+    await embed(page).getByRole("button", { name: v.loadLive }).focus();
+    await page.keyboard.press("Enter");
+
+    await expect(embed(page)).toHaveAttribute("data-state", "loading");
+    await expect(embed(page).getByRole("button", { name: v.loadLive })).toHaveCount(0);
+    expect(await focus()).toEqual({ inside: true, tag: "FIGURE" });
+    await expect(embed(page).getByRole("status")).toHaveText(v.liveLoading);
+    // The hidden, still-loading iframe is not a tab stop.
+    await expect(embed(page).locator("iframe")).toHaveAttribute("tabindex", "-1");
+
+    release();
+    await expect(embed(page)).toHaveAttribute("data-state", "live");
+    await expect(embed(page).locator("iframe")).toHaveAttribute("tabindex", "0");
+    await expect.poll(focus).toEqual({ inside: true, tag: "IFRAME" });
+  });
+
+  test("LiveEmbed: keyboard: when loading fails, focus is still inside the embed", async ({ page }) => {
+    await page.route(`${QR_ORIGIN}/**`, (route) => route.abort());
+    await page.goto("/en/demo-lab/");
+    await embed(page).getByRole("button", { name: v.loadLive }).focus();
+    await page.keyboard.press("Enter");
+    await expect(embed(page)).toHaveAttribute("data-state", "failed", { timeout: 10_000 });
+    const active = await page.evaluate(() => ({
+      inside: document.querySelector("[data-live-embed]")!.contains(document.activeElement),
+      body: document.activeElement === document.body,
+    }));
+    expect(active).toEqual({ inside: true, body: false });
+    // The external link is the next tab stop.
+    await page.keyboard.press("Tab");
+    await expect(external(page)).toBeFocused();
   });
 
   test("LiveEmbed: a frame that never finishes loading falls back after about 8s", async ({ page }) => {

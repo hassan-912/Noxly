@@ -22,6 +22,10 @@ type State = "idle" | "loading" | "live" | "failed";
  * 8 seconds, the iframe is removed and the poster returns with a short explanation.
  *
  * It fills the width of its container, so a device frame around it changes the iframe's width.
+ *
+ * Focus: the button goes away once loading starts, so focus moves to the embed itself (which
+ * announces the loading or fallback message) and on to the iframe once the site is showing.
+ * The hidden, still-loading iframe is not a tab stop.
  */
 export function LiveEmbed({
   url,
@@ -45,6 +49,21 @@ export function LiveEmbed({
   const [state, setState] = useState<State>("idle");
   const [posterBroken, setPosterBroken] = useState(false);
   const progress = useRef({ probed: false, framed: false });
+  const figure = useRef<HTMLElement>(null);
+  const frame = useRef<HTMLIFrameElement>(null);
+
+  const load = () => {
+    setState("loading");
+    // The button is about to unmount: keep focus inside the embed instead of dropping to <body>.
+    figure.current?.focus({ preventScroll: true });
+  };
+
+  // Once the site shows, hand focus to it, unless the visitor has moved on meanwhile.
+  useEffect(() => {
+    if (state === "live" && figure.current?.contains(document.activeElement)) {
+      frame.current?.focus({ preventScroll: true });
+    }
+  }, [state]);
 
   useEffect(() => {
     if (state !== "loading") return;
@@ -77,7 +96,14 @@ export function LiveEmbed({
   const showPoster = state !== "live";
 
   return (
-    <figure data-live-embed="" data-state={state} className={cn("live-embed", className)}>
+    <figure
+      ref={figure}
+      tabIndex={-1}
+      aria-label={t.liveTitle.replace("{name}", title)}
+      data-live-embed=""
+      data-state={state}
+      className={cn("live-embed", className)}
+    >
       <div className="live-embed__screen">
         {showPoster &&
           (poster && !posterBroken ? (
@@ -105,11 +131,16 @@ export function LiveEmbed({
 
         {showFrame && (
           <iframe
+            ref={frame}
             src={url}
+            tabIndex={state === "live" ? 0 : -1}
             title={t.liveTitle.replace("{name}", title)}
             onLoad={onFrameLoad}
             referrerPolicy="no-referrer"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+            // The site's own features must work inside the frame: downloads (QR assets), links
+            // that open new tabs as normal pages, and copy to clipboard.
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads"
+            allow="clipboard-write"
             className={cn(
               "absolute inset-0 size-full border-0 bg-surface transition-opacity duration-500",
               state === "live" ? "opacity-100" : "pointer-events-none opacity-0",
@@ -122,7 +153,7 @@ export function LiveEmbed({
             {state === "idle" && (
               <button
                 type="button"
-                onClick={() => setState("loading")}
+                onClick={load}
                 className="hero-cta inline-flex min-h-12 cursor-pointer items-center gap-2.5 rounded-full bg-indigo py-3 ps-5 pe-6 text-base font-medium text-surface transition-colors duration-200 hover:bg-ink"
               >
                 <Play aria-hidden="true" className="size-4 shrink-0 fill-current rtl:-scale-x-100" />

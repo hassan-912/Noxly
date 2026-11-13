@@ -7,7 +7,7 @@ import { useMediaQuery } from "@/lib/media";
 import { useMotionOK } from "@/lib/motion";
 import { demoRegistry } from "@/components/demos/registry";
 import { DeviceControls, type Device } from "./DeviceControls";
-import { DeviceFrame, type FrameSize } from "./DeviceFrame";
+import { DeviceFrame, frameScale, type FrameSize } from "./DeviceFrame";
 import { panelId, ProjectRail, tabId, type RailItem } from "./ProjectRail";
 
 export type ViewerItem = RailItem & { demo: DemoId };
@@ -22,6 +22,9 @@ export type ViewerLabels = {
 
 /** How long the outgoing demo stays while the next one fades in. Matches `viewer-out` in CSS. */
 const CROSSFADE_MS = 280;
+
+/** The default device is the largest one that fits the stage at this scale or more. */
+const MIN_DEFAULT_SCALE = 0.85;
 
 /** Start loading the demo when the viewer is within this distance of the viewport. */
 const NEAR_MARGIN = "240px 0px";
@@ -50,7 +53,9 @@ export function ViewerStage({
   infos: ReactNode[];
 }) {
   const [active, setActive] = useState(0);
-  const [device, setDevice] = useState<Device>("desktop");
+  // The visitor's explicit choice, if any; it persists across resizes. Until then the device
+  // follows the stage (resolved after mount, so the static HTML is always "desktop").
+  const [choice, setChoice] = useState<Device | null>(null);
   const wide = useMediaQuery("(min-width: 48rem)");
   const motionOK = useMotionOK();
 
@@ -91,6 +96,12 @@ export function ViewerStage({
       window.removeEventListener("resize", measure);
     };
   }, []);
+
+  // Default: desktop where it stays readable (scale of 0.85 or more, in practice from about
+  // 1400px); otherwise tablet, which a 768px+ viewport shows at close to full size.
+  const fitting: Device =
+    !size || frameScale("desktop", size.inline) >= MIN_DEFAULT_SCALE ? "desktop" : "tablet";
+  const device = choice ?? fitting;
 
   // The demo follows the selection as a deferred value: while the next demo's chunk loads, the
   // current one stays on screen instead of a loading state.
@@ -141,7 +152,7 @@ export function ViewerStage({
               label={labels.devices}
               labels={labels.device}
               value={device}
-              onChange={setDevice}
+              onChange={setChoice}
               className="ms-auto hidden md:flex"
             />
           </div>

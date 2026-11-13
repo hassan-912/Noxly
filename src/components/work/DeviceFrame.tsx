@@ -16,6 +16,14 @@ const TOP_BAR = 20;
 const screenBlock = (device: Device, inline: number) =>
   device === "desktop" ? Math.round(inline / 1.5) : device === "tablet" ? 1024 : 780;
 
+/** Outer width of a device's frame when `inline` px are available. */
+const frameInline = (device: Device, inline: number) =>
+  (device === "desktop" ? Math.max(deviceWidth.desktop, Math.floor(inline) - 2 * bezel.desktop) : deviceWidth[device]) +
+  2 * bezel[device];
+
+/** How much a device's frame is scaled down (1 = full size) to fit `inline` px. */
+export const frameScale = (device: Device, inline: number) => Math.min(1, inline / frameInline(device, inline));
+
 export type FrameSize = {
   /** Width available to the frame, in px. */
   inline: number;
@@ -90,12 +98,9 @@ export function DeviceFrame({
   let stageStyle: CSSProperties | undefined;
   let frameStyle: CSSProperties | undefined;
   if (size) {
-    const inner =
-      device === "desktop"
-        ? Math.max(deviceWidth.desktop, Math.floor(size.inline) - 2 * bezel.desktop)
-        : deviceWidth[device];
-    const outer = inner + 2 * bezel[device];
-    const scale = Math.min(1, size.inline / outer);
+    const outer = frameInline(device, size.inline);
+    const inner = outer - 2 * bezel[device];
+    const scale = frameScale(device, size.inline);
     // Each device keeps its own proportions, up to the height the stage allows; taller content
     // scrolls inside the screen.
     const natural = screenBlock(device, inner) + 2 * bezel[device] + (device === "desktop" ? TOP_BAR : 0);

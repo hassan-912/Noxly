@@ -13,6 +13,11 @@
   --color-teal: #4ab5b5;
   --color-teal-text: #2c7f80;
   --color-sky: #8fd9fb;
+
+  /* Container-query breakpoints of the coded demos: @d1, @d2, @d3. */
+  --container-d1: 420px;
+  --container-d2: 760px;
+  --container-d3: 920px;
 }
 
 html {
@@ -320,4 +325,79 @@ body {
       --p: 1 !important;
     }
   }
+}
+
+/* ───────────────────────── Coded demos (sample data) ───────────────────────── */
+
+@layer components {
+  /* One calm product family: frost body, white panels, hairlines. The root is a size container
+     (Tailwind @container), so layouts follow the frame's width, not the viewport's. */
+  .demo {
+    background: var(--color-frost);
+    color: var(--color-ink);
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    text-align: start;
+  }
+
+  .locale-ar .demo {
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  /* Small labels: mono for Latin scripts, the text face for Arabic (mono has no Arabic glyphs). */
+  .demo-kicker {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    line-height: 1.4;
+  }
+
+  .locale-ar .demo-kicker,
+  [lang=ar] .demo-kicker {
+    font-family: inherit;
+    font-size: 0.75rem;
+  }
+
+  /* Illustrative phone. Drawn in design pixels (--u = 1/280 of its width) so it keeps its
+     proportions at any size; Tailwind spacing inside is in the same unit. */
+  .demo-phone {
+    container-type: inline-size;
+    inline-size: 100%;
+    max-inline-size: 17.5rem;
+    aspect-ratio: 280 / 572;
+    margin: 0;
+  }
+
+  .demo-phone__body {
+    --u: calc(100cqi / 280);
+    --spacing: calc(var(--u) * 4);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    block-size: 100%;
+    overflow: hidden;
+    border: calc(var(--u) * 7) solid var(--color-ink);
+    border-radius: calc(var(--u) * 40);
+    background: var(--color-frost);
+    color: var(--color-ink);
+    font-size: calc(var(--u) * 12);
+    line-height: 1.35;
+    text-align: start;
+    box-shadow:
+      0 1px 1px rgb(14 26 36 / 0.05),
+      0 calc(var(--u) * 12) calc(var(--u) * 26) calc(var(--u) * -12) rgb(14 26 36 / 0.18),
+      0 calc(var(--u) * 36) calc(var(--u) * 60) calc(var(--u) * -30) rgb(14 26 36 / 0.28);
+  }
+
+  [lang=ar] .demo-phone__body {
+    line-height: 1.55;
+  }
+
+  .mp-t1 { font-size: calc(var(--u) * 9.5); }
+  .mp-t2 { font-size: calc(var(--u) * 11); }
+  .mp-t3 { font-size: calc(var(--u) * 12.5); }
+  .mp-t4 { font-size: calc(var(--u) * 15); }
+  .mp-t5 { font-size: calc(var(--u) * 19); }
+  .mp-r1 { border-radius: calc(var(--u) * 8); }
+  .mp-r2 { border-radius: calc(var(--u) * 14); }
 }

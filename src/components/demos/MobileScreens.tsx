@@ -138,7 +138,7 @@ function HomeScreen({ dict }: { dict: Strings }) {
         <p className="mp-t4 font-semibold">{fill(t.greeting, { name: dict.people.applicantA })}</p>
       </div>
       <div className="mp-r2 bg-ink p-3.5 text-surface">
-        <p className="mp-t1 font-medium text-sky">{t.nextConsultation}</p>
+        <p className="mp-t1 font-medium text-mist">{t.nextConsultation}</p>
         <p className="mp-t5 mt-1 leading-tight font-semibold">
           {t.sampleDate} · <Ltr className="font-mono">{nextConsultation.time}</Ltr>
         </p>

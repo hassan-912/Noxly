@@ -113,7 +113,8 @@ export default function ReviewDemo({ locale }: DemoProps) {
                 <Kicker>{t.field}</Kicker>
                 {documents.map((doc) => (
                   <Kicker key={doc.key} className="truncate">
-                    {doc.tag} · {doc.name}
+                    {doc.tag}
+                    <span className="hidden @d3:inline"> · {doc.name}</span>
                   </Kicker>
                 ))}
               </div>

@@ -5,7 +5,6 @@ import { ArrowLeft, ArrowRight, Briefcase, Check, Info, Landmark, Plane, RotateC
 import { getDictionary } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import {
-  documentsFor,
   fundingCheck,
   funds as fundsRange,
   pathways,
@@ -273,39 +272,23 @@ export default function CalculatorDemo({ locale }: DemoProps) {
                 </Chip>
               </div>
 
-              <div className="mt-4 grid grid-cols-1 gap-4 @d3:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] @d3:gap-5">
-                <div>
-                  <div className="flex items-center gap-2.5">
-                    <span
-                      aria-hidden="true"
-                      className={cn(
-                        "grid size-7 shrink-0 place-items-center rounded-full [&>svg]:size-4",
-                        funding.covers ? "bg-[#e2f4f1] text-teal-text" : "bg-[#ffe8dc] text-[#a3441a]",
-                      )}
-                    >
-                      {funding.covers ? <Check strokeWidth={2.5} /> : <TriangleAlert />}
-                    </span>
-                    <div className="min-w-0">
-                      <Kicker>{t.fundingCheck}</Kicker>
-                      <p className="font-semibold">{funding.covers ? t.fundingCovers : t.fundingBelow}</p>
-                    </div>
+              <div className="mt-4 grid grid-cols-1 gap-3 @d3:grid-cols-[15rem_minmax(0,1fr)] @d3:items-center @d3:gap-5">
+                <div className="flex items-center gap-2.5">
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      "grid size-7 shrink-0 place-items-center rounded-full [&>svg]:size-4",
+                      funding.covers ? "bg-[#e2f4f1] text-teal-text" : "bg-[#ffe8dc] text-[#a3441a]",
+                    )}
+                  >
+                    {funding.covers ? <Check strokeWidth={2.5} /> : <TriangleAlert />}
+                  </span>
+                  <div className="min-w-0">
+                    <Kicker>{t.fundingCheck}</Kicker>
+                    <p className="font-semibold">{funding.covers ? t.fundingCovers : t.fundingBelow}</p>
                   </div>
-                  <div className="mt-3">{fundingSummary}</div>
                 </div>
-
-                <div>
-                  <Kicker>
-                    {t.documents} · {dict.common.sample}
-                  </Kicker>
-                  <ul className="mt-2 space-y-1.5">
-                    {documentsFor(pathway, work).map((doc) => (
-                      <li key={doc} className="flex items-start gap-2">
-                        <span aria-hidden="true" className="mt-[0.2rem] size-3.5 shrink-0 rounded border border-slate bg-surface" />
-                        {t.docs[doc]}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                {fundingSummary}
               </div>
 
               <p className="mt-4 flex items-start gap-2 rounded-lg border border-mist bg-frost p-3 font-medium">

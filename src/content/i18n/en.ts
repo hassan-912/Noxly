@@ -111,7 +111,6 @@ export const en = {
       back: "Back",
       step: "Step {current} of {total}",
       views: "Demo view",
-      sample: "Sample",
     },
     /** Fictional people and organisations shared by the demos. */
     people: {
@@ -156,7 +155,8 @@ export const en = {
       evidenceSame: "Both documents state the same value for this field.",
       aiModel: "Google Gemini",
       aiSampleLabel: "Sample observation",
-      aiSample: "The cover letter describes a 10-day trip. The itinerary lists 14 days.",
+      aiSample:
+        "The employment letter describes the role in more detail than the application form does. A reviewer may want to check that both describe the same position.",
       reportTitle: "Review report",
       reportDocuments: "Documents compared",
       reportFindings: "Discrepancies",
@@ -195,18 +195,6 @@ export const en = {
       answers: "Your answers",
       travelHistory: "Travel history",
       workSituation: "Work situation",
-      documents: "Documents to prepare",
-      docs: {
-        passport: "Passport copy",
-        bankStatement: "Bank statement",
-        itinerary: "Travel itinerary",
-        employmentLetter: "Employment letter",
-        businessRecords: "Business registration records",
-        enrolment: "Proof of enrolment",
-        qualifications: "Qualification certificates",
-        anabin: "Degree lookup in Anabin",
-        cv: "CV",
-      },
     },
     consultation: {
       title: "Book a consultation",

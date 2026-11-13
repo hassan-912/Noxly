@@ -4,17 +4,6 @@
  */
 export type Pathway = "tourism" | "immigration" | "jobSeeker";
 export type Work = "employed" | "selfEmployed" | "student";
-export type DocId =
-  | "passport"
-  | "bankStatement"
-  | "itinerary"
-  | "employmentLetter"
-  | "businessRecords"
-  | "enrolment"
-  | "qualifications"
-  | "anabin"
-  | "cv";
-
 export const pathways: Pathway[] = ["tourism", "immigration", "jobSeeker"];
 export const workOptions: Work[] = ["employed", "selfEmployed", "student"];
 
@@ -31,23 +20,6 @@ export const stayOptions: Record<Pathway, number[]> = {
 };
 
 export const funds = { min: 20000, max: 400000, step: 5000, initial: 120000 } as const;
-
-const pathwayDocs: Record<Pathway, DocId[]> = {
-  tourism: ["itinerary"],
-  immigration: ["qualifications"],
-  jobSeeker: ["cv", "anabin"],
-};
-
-const workDocs: Record<Work, DocId> = {
-  employed: "employmentLetter",
-  selfEmployed: "businessRecords",
-  student: "enrolment",
-};
-
-/** The sample checklist the answers lead to. */
-export function documentsFor(pathway: Pathway, work: Work): DocId[] {
-  return ["passport", "bankStatement", workDocs[work], ...pathwayDocs[pathway]];
-}
 
 /** Funding check with the sample figures: required = days × daily amount; available = funds ÷ rate. */
 export function fundingCheck(pathway: Pathway, days: number, fundsEgp: number) {

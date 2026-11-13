@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
-import { site } from "@/content/site";
 import { getDictionary, isLocale } from "@/lib/i18n";
 import { sectionIds } from "@/components/layout/nav";
+import { Hero } from "@/components/hero/Hero";
 
 /**
- * Home page shell. Every section exists with its final anchor id and heading so navigation
- * works now; later tasks replace each placeholder with the real section (spec §7 order).
+ * Home page: the hero (the only h1), then every section with its final anchor id and heading so
+ * navigation works now; later tasks replace each placeholder with the real section (spec §7 order).
  */
 export default async function Home({ params }: PageProps<"/[locale]">) {
   const { locale } = await params;
@@ -14,10 +14,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
 
   return (
     <>
-      {/* TODO(task 4): the hero renders the visible h1. */}
-      <h1 className="sr-only">
-        {site.name} — {dict.identity.role}
-      </h1>
+      <Hero dict={dict} />
       {sectionIds.map((id, i) => (
         <section
           key={id}

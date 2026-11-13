@@ -51,3 +51,273 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* ───────────────────────── Hero (cinematic moment 1) ───────────────────────── */
+
+/* In the components layer so Tailwind utilities on the same element still win. */
+@layer components {
+  :root {
+    /* Pastels derived for the hero atmosphere only (spec §8). */
+    --aurora-lavender: #cfcaff;
+    --aurora-peach: #ffd3bd;
+    --aurora-mint: #bdeadf;
+  }
+  
+  /* Aurora: soft gradient layers, heavier at the end side behind the composition. */
+  .hero-aurora {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: clip;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent);
+    mask-image: linear-gradient(to bottom, #000 62%, transparent);
+  }
+  
+  .hero-aurora__layer {
+    position: absolute;
+    border-radius: 50%;
+    will-change: transform;
+  }
+  
+  .hero-aurora__layer--lavender {
+    inset-block-start: -28%;
+    inset-inline-end: -8%;
+    inline-size: min(62rem, 120vw);
+    aspect-ratio: 1.15;
+    background: radial-gradient(closest-side, var(--aurora-lavender), transparent);
+    opacity: 0.9;
+  }
+  
+  .hero-aurora__layer--sky {
+    inset-block-start: 18%;
+    inset-inline-end: -18%;
+    inline-size: min(46rem, 100vw);
+    aspect-ratio: 1;
+    background: radial-gradient(closest-side, var(--color-sky), transparent);
+    opacity: 0.42;
+  }
+  
+  .hero-aurora__layer--peach {
+    inset-block-end: -6%;
+    inset-inline-end: 20%;
+    inline-size: min(44rem, 105vw);
+    aspect-ratio: 1.3;
+    background: radial-gradient(closest-side, var(--aurora-peach), transparent);
+    opacity: 0.8;
+  }
+  
+  .hero-aurora__layer--mint {
+    inset-block-start: -22%;
+    inset-inline-start: -14%;
+    inline-size: min(40rem, 95vw);
+    aspect-ratio: 1.2;
+    background: radial-gradient(closest-side, var(--aurora-mint), transparent);
+    opacity: 0.6;
+  }
+  
+  @keyframes hero-drift-a {
+    to {
+      transform: translate3d(-7%, 9%, 0) scale(1.12);
+    }
+  }
+  
+  @keyframes hero-drift-b {
+    to {
+      transform: translate3d(9%, -8%, 0) scale(0.92);
+    }
+  }
+  
+  @keyframes hero-drift-c {
+    to {
+      transform: translate3d(-10%, -6%, 0) scale(1.1);
+    }
+  }
+  
+  @keyframes hero-word-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.32em);
+    }
+  }
+  
+  @keyframes hero-comp-in {
+    from {
+      opacity: 0;
+      transform: translateY(1.25rem);
+    }
+  }
+  
+  /* All hero motion exists only when motion is welcome. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-aurora__layer--lavender {
+      animation: hero-drift-a 20s ease-in-out infinite alternate;
+    }
+    .hero-aurora__layer--sky {
+      animation: hero-drift-b 24s ease-in-out infinite alternate;
+    }
+    .hero-aurora__layer--peach {
+      animation: hero-drift-c 22s ease-in-out infinite alternate;
+    }
+    .hero-aurora__layer--mint {
+      animation: hero-drift-b 26s ease-in-out infinite alternate-reverse;
+    }
+    .hero-aurora[data-paused="true"] .hero-aurora__layer {
+      animation-play-state: paused;
+    }
+  
+    /* 520ms per word; StaggerHeadline spaces the delays so the whole reveal stays under 1s. */
+    .hero-word {
+      animation: hero-word-in 520ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+      animation-delay: var(--word-delay, 0ms);
+    }
+  
+    .hero-comp {
+      animation: hero-comp-in 900ms cubic-bezier(0.2, 0.7, 0.2, 1) 120ms both;
+    }
+  }
+  
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--color-ink-muted);
+  }
+  
+  .locale-ar .hero-eyebrow {
+    font-family: inherit;
+    font-size: 0.9375rem;
+  }
+  
+  .hero-eyebrow__mark {
+    flex: none;
+    inline-size: 1.75rem;
+    block-size: 1px;
+    background: var(--color-slate);
+  }
+  
+  .hero-headline {
+    font-size: clamp(2.75rem, 5.2vw + 0.5rem, 4.75rem);
+    font-weight: 600;
+    line-height: 1.02;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+    color: var(--color-ink);
+  }
+  
+  /* Arabic: no tracking (it breaks joining) and room for the taller letterforms. */
+  .locale-ar .hero-headline {
+    font-size: clamp(2.5rem, 4.6vw + 0.5rem, 4.25rem);
+    line-height: 1.3;
+    letter-spacing: 0;
+  }
+  
+  .hero-word {
+    display: inline-block;
+  }
+  
+  .hero-scramble {
+    color: var(--color-indigo);
+  }
+  
+  .hero-cta {
+    box-shadow:
+      0 1px 2px rgb(14 26 36 / 0.12),
+      0 10px 24px -10px rgb(82 90 255 / 0.55);
+  }
+  
+  /* Composition: drawn in design pixels (`--u`) that scale with the column, so the screens keep
+     their proportions at every width. Tailwind spacing inside the stage is in the same unit. */
+  .hero-comp {
+    container-type: inline-size;
+    --hc-w: 540;
+    --hc-h: 512;
+    inline-size: 100%;
+    max-inline-size: 40rem;
+    margin-inline: auto;
+  }
+
+  @media (min-width: 40rem) {
+    .hero-comp {
+      --hc-w: 580;
+    }
+  }
+  
+  .hero-comp__stage {
+    --u: calc(100cqi / var(--hc-w));
+    --spacing: calc(var(--u) * 4);
+    --p: 0;
+    --dir: 1;
+    position: relative;
+    block-size: calc(var(--u) * var(--hc-h));
+    color: var(--color-ink);
+    line-height: 1.35;
+  }
+  
+  [dir="rtl"] .hero-comp__stage {
+    --dir: -1;
+  }
+  
+  .hero-screen {
+    position: absolute;
+    overflow: hidden;
+    border: 1px solid rgb(212 221 226 / 0.9);
+    border-radius: calc(var(--u) * 14);
+    background: var(--color-surface);
+    box-shadow:
+      0 1px 1px rgb(14 26 36 / 0.04),
+      0 calc(var(--u) * 10) calc(var(--u) * 22) calc(var(--u) * -10) rgb(14 26 36 / 0.12),
+      0 calc(var(--u) * 34) calc(var(--u) * 64) calc(var(--u) * -28) rgb(14 26 36 / 0.22);
+    /* `--p` 0 → 1: from fanned out (offset by --x/--y, rotated --r0) to settled (rotated --r1). */
+    transform: translate(
+        calc(var(--x) * var(--dir) * (1 - var(--p)) * var(--u)),
+        calc(var(--y) * (1 - var(--p)) * var(--u))
+      )
+      rotate(calc((var(--r1) + (var(--r0) - var(--r1)) * (1 - var(--p))) * var(--dir) * 1deg));
+    will-change: transform;
+  }
+  
+  .hc-title {
+    font-size: calc(var(--u) * 11.5);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  
+  .hc-label {
+    font-size: calc(var(--u) * 10);
+  }
+  
+  .hc-small {
+    font-size: calc(var(--u) * 8.75);
+  }
+  
+  .locale-ar .hc-title {
+    letter-spacing: 0;
+  }
+  
+  .hero-comp__caption {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-block-start: 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-ink-muted);
+  }
+  
+  .locale-ar .hero-comp__caption {
+    font-family: inherit;
+    font-size: 0.8125rem;
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    /* No scroll-linked transforms: the composition is simply settled. */
+    .hero-comp__stage {
+      --p: 1 !important;
+    }
+  }
+}

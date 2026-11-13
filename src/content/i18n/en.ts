@@ -303,6 +303,13 @@ export const en = {
     hint: "Select a step to see what it does.",
     technologies: "Technologies",
     close: "Close",
+    /** Accessible name of a project's list of steps. */
+    stepsLabel: "{project}: steps of the system",
+    /** Shown with every view: the diagram is the real system, not a generic architecture. */
+    note: "Each view shows how that project is actually built, simplified to its main parts.",
+    connections: "Connections",
+    comesFrom: "Comes from",
+    leadsTo: "Leads to",
     tabs: {
       review: "Review",
       consultation: "Consultation",

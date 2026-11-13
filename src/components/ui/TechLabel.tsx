@@ -12,6 +12,27 @@ const simpleBySlug = new Map(
 );
 
 /**
+ * The icon of a technology alone, decorative (aria-hidden): always pair it with the name nearby.
+ * Renders nothing when there is no glyph. Server component only, like `TechLabel`.
+ */
+export function TechIcon({ id, className }: { id: TechId; className?: string }) {
+  const item = tech[id];
+  if (!item) throw new Error(`Unknown tech: ${id}`);
+  const brand = item.simpleIcon ? simpleBySlug.get(item.simpleIcon) : undefined;
+  const Glyph = item.lucide
+    ? (lucide as unknown as Record<string, ComponentType<SVGProps<SVGSVGElement>>>)[item.lucide]
+    : undefined;
+  if (brand) {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" className={className}>
+        <path d={brand.path} />
+      </svg>
+    );
+  }
+  return Glyph ? <Glyph aria-hidden="true" strokeWidth={1.75} className={className} /> : null;
+}
+
+/**
  * A technology as its icon plus its readable name (never an icon alone). Latin in every locale.
  *
  * Server component only: it looks icons up by name in the whole Simple Icons and Lucide sets,
@@ -20,10 +41,6 @@ const simpleBySlug = new Map(
 export function TechLabel({ id, className }: { id: TechId; className?: string }) {
   const item = tech[id];
   if (!item) throw new Error(`Unknown tech: ${id}`);
-  const brand = item.simpleIcon ? simpleBySlug.get(item.simpleIcon) : undefined;
-  const Glyph = item.lucide
-    ? (lucide as unknown as Record<string, ComponentType<SVGProps<SVGSVGElement>>>)[item.lucide]
-    : undefined;
 
   return (
     <span
@@ -33,13 +50,7 @@ export function TechLabel({ id, className }: { id: TechId; className?: string })
         className,
       )}
     >
-      {brand ? (
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" className="size-3.5 shrink-0 text-slate">
-          <path d={brand.path} />
-        </svg>
-      ) : Glyph ? (
-        <Glyph aria-hidden="true" strokeWidth={1.75} className="size-3.5 shrink-0 text-slate" />
-      ) : null}
+      <TechIcon id={id} className="size-3.5 shrink-0 text-slate" />
       <bdi dir="ltr" className="min-w-0 truncate">
         {item.name}
       </bdi>

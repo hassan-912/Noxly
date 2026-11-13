@@ -9,10 +9,16 @@ export interface DiagramNode {
   row: number;
 }
 
+/**
+ * A connection from one step to the next. The optional label names what passes along it, only
+ * where docs/brief.md says so; most connections are unlabeled.
+ */
+export type DiagramEdge = [from: string, to: string, label?: Localized<string>];
+
 export interface Diagram {
   project: "review" | "consultation" | "calculator" | "mg-mobile";
   nodes: DiagramNode[];
-  edges: [string, string][];
+  edges: DiagramEdge[];
 }
 
 const node = (
@@ -22,7 +28,8 @@ const node = (
 /**
  * One view per project, following the brief's four pipelines. Each project has its own shape;
  * nothing here implies a shared architecture. `col` is the step along the flow, `row` the lane.
- * TODO(task 11): replace each `untranslated(...)` (inside `node`) with real de/fr/ar text.
+ * TODO(task 11): replace each `untranslated(...)` (inside `node`, and on edge labels) with real
+ * de/fr/ar text.
  */
 export const diagrams: Diagram[] = [
   {
@@ -43,7 +50,8 @@ export const diagrams: Diagram[] = [
     edges: [
       ["documents", "processing"],
       ["processing", "checks"],
-      ["processing", "ai-review"],
+      // Brief: "uses AI for selected narrative checks".
+      ["processing", "ai-review", untranslated("Selected narrative checks")],
       ["checks", "report"],
       ["ai-review", "report"],
     ],
@@ -75,19 +83,20 @@ export const diagrams: Diagram[] = [
         "Questionnaires for tourism, immigration, and job-seeker pathways."),
       node("scoring", 1, 0, "Browser scoring", ["typescript"],
         "Answers are scored in the browser and organized into a structured assessment."),
-      node("rates", 2, 0, "Exchange rates", ["exchangerate-api"],
-        "Funding checks convert amounts with ExchangeRate-API."),
-      node("anabin", 2, 1, "Anabin lookups", ["anabin"],
+      node("anabin", 2, 0, "Anabin lookups", ["anabin"],
         "Qualifications can be looked up in the Anabin database."),
+      node("rates", 2, 1, "Exchange rates", ["exchangerate-api"],
+        "Funding checks convert amounts with ExchangeRate-API."),
       node("report", 3, 0, "Assessment report", [],
         "A report of the preliminary MG assessment. It is not an official eligibility decision."),
     ],
     edges: [
       ["interface", "scoring"],
-      ["scoring", "rates"],
       ["scoring", "anabin"],
-      ["rates", "report"],
+      // Brief: "funding checks".
+      ["scoring", "rates", untranslated("Funding checks")],
       ["anabin", "report"],
+      ["rates", "report"],
     ],
   },
   {

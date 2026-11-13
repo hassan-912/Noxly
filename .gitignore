@@ -50,3 +50,6 @@ next-env.d.ts
 # playwright
 /test-results/
 /playwright-report/
+
+# test env is committed (test-only values, no secrets)
+!.env.test

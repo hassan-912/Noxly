@@ -28,17 +28,17 @@ export const projects: Project[] = [
       contribution:
         "I designed and built it on my own: the document processing, the factual comparisons, the AI-assisted checks, and the reports.",
       approach:
-        "Documents are read with PyMuPDF and OCR, then structured with Pydantic. Deterministic checks compare the facts across documents and link every finding to its source. Google Gemini is used only for selected narrative checks, and its results stay separate from the factual comparisons. Reviewers work in a Streamlit interface and can export the findings as a PDF report.",
+        "Documents are read with PyMuPDF and OCR, then structured with Pydantic. Deterministic checks compare the facts across documents and link every finding to its source. Google Gemini is used only for selected narrative checks; the factual comparisons don't depend on it. Reviewers work in a Streamlit interface and can export the findings as a PDF report.",
       features: [
         "Document processing with PyMuPDF and OCR",
         "Factual comparisons across documents",
         "Findings backed by evidence from the source document",
-        "AI-assisted review for selected narrative checks, kept apart from the deterministic checks",
+        "AI-assisted review for selected narrative checks only",
         "Clear PDF reports of the findings",
       ],
       outcomes: [
         "Reviewers see each discrepancy next to the source text it came from.",
-        "Factual checks and AI-assisted checks are labelled separately, so it's always clear where a finding came from.",
+        "Gemini is used only for selected narrative checks; the factual comparisons don't depend on it.",
         "A file's findings can be shared as one clear report.",
       ],
     }),
@@ -193,7 +193,7 @@ export const projects: Project[] = [
     embeddable: false,
     demo: null,
     stack: ["javascript", "pwa", "cloudflare-workers", "d1", "cron-triggers", "web-push"],
-    status: ["personal-project"],
+    status: [],
     authorship: { kind: "solo" },
     caseStudy: false,
     text: untranslated({
@@ -218,7 +218,7 @@ export const projects: Project[] = [
     embeddable: true,
     demo: null,
     stack: ["nextjs", "react", "typescript", "tailwind", "framer-motion", "supabase", "qr-code-styling"],
-    status: ["personal-project", "public-site"],
+    status: ["public-site"],
     authorship: { kind: "solo" },
     caseStudy: false,
     text: untranslated({
@@ -265,7 +265,7 @@ export const projects: Project[] = [
     embeddable: false,
     demo: null,
     stack: ["shopify"],
-    status: ["client-store"],
+    status: [],
     authorship: { kind: "solo" },
     caseStudy: false,
     text: untranslated({
@@ -284,7 +284,7 @@ export const projects: Project[] = [
     embeddable: false,
     demo: null,
     stack: ["python"],
-    status: ["study-project"],
+    status: [],
     authorship: { kind: "solo" },
     caseStudy: false,
     text: untranslated({

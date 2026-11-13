@@ -228,7 +228,7 @@ export const en = {
     shared: "Team project",
   },
   footer: {
-    privacy: "No cookies, no tracking",
+    privacy: "This site sets no cookies and no tracking.",
     copyright: "© {year} Hassan Azab",
     backToTop: "Back to top",
   },

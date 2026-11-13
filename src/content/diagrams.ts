@@ -36,7 +36,7 @@ export const diagrams: Diagram[] = [
       node("checks", 2, 0, "Factual checks", ["python"],
         "Deterministic rules compare the same facts across documents and record where each value was found."),
       node("ai-review", 2, 1, "AI-assisted review", ["gemini"],
-        "Google Gemini reviews selected narrative sections only. Its output is labelled as AI-assisted and kept apart from the factual checks."),
+        "Google Gemini is used only for selected narrative checks. The factual comparisons don't depend on it."),
       node("report", 3, 0, "Evidence and report", ["streamlit", "pdf-reporting"],
         "Findings appear in Streamlit next to their source evidence and can be exported as a PDF report."),
     ],

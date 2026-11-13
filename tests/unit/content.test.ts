@@ -68,7 +68,7 @@ describe("dictionaries", () => {
     expect(en.demos.label).toBe("Illustrative demo · sample data");
     expect(en.diagram.caption).toBe("Illustrative animation — not live traffic");
     expect(en.building.mobileStatus).toBe("In development · not released");
-    expect(en.footer.privacy).toBe("No cookies, no tracking");
+    expect(en.footer.privacy).toBe("This site sets no cookies and no tracking.");
   });
 
   test("helpers: getDictionary, isLocale, dirOf", () => {
@@ -166,6 +166,11 @@ describe("projects", () => {
     }
     const voclio = getProject("voclio").authorship;
     expect(voclio.kind === "shared" && voclio.note.en).toMatch(/team of eight/i);
+  });
+
+  test("statuses are only those the brief or spec supports", () => {
+    expect(getProject("qr-studio").status).toEqual(["public-site"]);
+    for (const slug of ["mawid", "femine-eg", "treasure-hunt"] as const) expect(getProject(slug).status, slug).toEqual([]);
   });
 
   test("mg-mobile status includes in-development and not-released", () => {
@@ -273,6 +278,7 @@ describe("site, story, services", () => {
     const banned = [
       /\d+\s*%/, /years? of (engineering )?experience/i, /guarantee/i, /approval rate/i,
       /\b\d+\+? countries\b/i, /testimonial/i, /senior/i, /certified/i, /app store|google play/i,
+      /partner/i, /predict/i, /accura(te|cy)/i,
     ];
     const strings = englishStrings([en, projects, story, services, diagrams, status, site]);
     expect(strings.length).toBeGreaterThan(200);

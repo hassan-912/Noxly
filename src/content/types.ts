@@ -6,7 +6,7 @@ export type ProjectSlug = "review" | "calculator" | "consultation" | "mg-mobile"
   | "qr-studio" | "voclio" | "femine-eg" | "treasure-hunt" | "muscle-generator";
 export type DemoId = "review" | "calculator" | "consultation" | "crew-mg" | "mg-mobile";
 export type StatusKey = "internal-tool" | "public-site" | "in-development" | "not-released"
-  | "graduation-project" | "client-store" | "study-project" | "personal-project" | "team-project";
+  | "graduation-project" | "team-project";
 export type TechId = string; // keys of tech.ts
 
 export interface ProjectText {

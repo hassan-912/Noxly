@@ -37,7 +37,7 @@ export function StaggerHeadline({
         return (
           <Fragment key={i}>
             {i > 0 && " "}
-            <span data-word className="hero-word" style={{ "--word-delay": `${delay}ms` } as CSSProperties}>
+            <span data-word data-first={i === 0 ? "" : undefined} className="hero-word" style={{ "--word-delay": `${delay}ms` } as CSSProperties}>
               {parts.map((part, j) =>
                 part.scramble ? (
                   <ScrambleText

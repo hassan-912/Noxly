@@ -1,4 +1,5 @@
-import { untranslated, type Localized, type TechId } from "./types";
+import type { Localized, TechId } from "./types";
+import { localized } from "./localized";
 
 export interface DiagramNode {
   id: string;
@@ -23,13 +24,12 @@ export interface Diagram {
 
 const node = (
   id: string, col: number, row: number, label: string, tech: TechId[], explain: string,
-): DiagramNode => ({ id, col, row, tech, label: untranslated(label), explain: untranslated(explain) });
+): DiagramNode => ({ id, col, row, tech, label: localized(label), explain: localized(explain) });
 
 /**
  * One view per project, following the brief's four pipelines. Each project has its own shape;
  * nothing here implies a shared architecture. `col` is the step along the flow, `row` the lane.
- * TODO(task 11): replace each `untranslated(...)` (inside `node`, and on edge labels) with real
- * de/fr/ar text.
+ * Node and edge copy resolves through the checked-in locale maps.
  */
 export const diagrams: Diagram[] = [
   {
@@ -51,7 +51,7 @@ export const diagrams: Diagram[] = [
       ["documents", "processing"],
       ["processing", "checks"],
       // Brief: "uses AI for selected narrative checks".
-      ["processing", "ai-review", untranslated("Selected narrative checks")],
+      ["processing", "ai-review", localized("Selected narrative checks")],
       ["checks", "report"],
       ["ai-review", "report"],
     ],
@@ -94,7 +94,7 @@ export const diagrams: Diagram[] = [
       ["interface", "scoring"],
       ["scoring", "anabin"],
       // Brief: "funding checks".
-      ["scoring", "rates", untranslated("Funding checks")],
+      ["scoring", "rates", localized("Funding checks")],
       ["anabin", "report"],
       ["rates", "report"],
     ],

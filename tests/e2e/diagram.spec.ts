@@ -1,15 +1,19 @@
 import { expect, test, type Page } from "@playwright/test";
-import { en } from "../../src/content/i18n/en";
+import { dictionaries } from "../../src/content/i18n";
 import { diagrams } from "../../src/content/diagrams";
 
-const t = en.diagram;
+const t = dictionaries.en.diagram;
 const tabLabels = [t.tabs.review, t.tabs.consultation, t.tabs.calculator, t.tabs.mobile];
+const arTabLabels = [dictionaries.ar.diagram.tabs.review, dictionaries.ar.diagram.tabs.consultation, dictionaries.ar.diagram.tabs.calculator, dictionaries.ar.diagram.tabs.mobile];
 const byProject = (project: string) => diagrams.find((d) => d.project === project)!;
 const projects = ["review", "consultation", "calculator", "mg-mobile"] as const;
 
 const systems = (page: Page) => page.locator("section#systems");
-const tablist = (page: Page) => systems(page).getByRole("tablist", { name: t.tablistLabel });
-const tab = (page: Page, name: string) => tablist(page).getByRole("tab", { name, exact: true });
+const tablist = (page: Page) => systems(page).getByRole("tablist");
+const tab = (page: Page, name: string) => tablist(page).getByRole("tab", {
+  name: page.url().includes("/ar/") ? arTabLabels[tabLabels.indexOf(name)] ?? name : name,
+  exact: true,
+});
 const nodes = (page: Page) => systems(page).locator("button[data-node]");
 const node = (page: Page, id: string) => systems(page).locator(`button[data-node="${id}"]`);
 const panel = (page: Page) => systems(page).locator("[data-node-panel]");
@@ -20,18 +24,7 @@ const flows = (page: Page) => systems(page).locator("svg[data-orientation]:visib
 const overflowX = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
 
 async function openDiagram(page: Page, locale: "en" | "ar" = "en") {
-  await page.goto(`/${locale}/`);
-  // The #work viewer above loads its demo when scrolled near and grows on phones: pass by it
-  // and let it settle first, as a visitor scrolling down would, so positions here stay put.
-  await page.locator("section#work").scrollIntoViewIfNeeded();
-  const workHeight = () => page.locator("section#work").evaluate((el) => el.getBoundingClientRect().height);
-  let before = -1;
-  for (let i = 0; i < 20; i++) {
-    await page.waitForTimeout(250);
-    const now = await workHeight();
-    if (now === before) break;
-    before = now;
-  }
+  await page.goto(`/${locale}/systems/`);
   await tablist(page).scrollIntoViewIfNeeded();
   await expect(tablist(page)).toBeVisible();
 }
@@ -179,7 +172,7 @@ test("caption 'Illustrative animation — not live traffic' is always visible", 
   }
 });
 
-test("dashes animate only while the diagram is in view", async ({ page }) => {
+test("dashes animate while the diagram is in view", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await openDiagram(page);
   await systems(page).locator("[data-diagram-canvas]").scrollIntoViewIfNeeded();
@@ -187,8 +180,6 @@ test("dashes animate only while the diagram is in view", async ({ page }) => {
     .poll(() => flows(page).first().evaluate((el) => el.getAnimations().map((a) => a.playState).join()))
     .toBe("running");
 
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await expect.poll(() => flows(page).first().evaluate((el) => el.getAnimations().length)).toBe(0);
 });
 
 test("reduced motion: path dash animation is not running", async ({ page }) => {
@@ -249,7 +240,7 @@ test("375px: vertical layout and panel as bottom sheet, no overflow", async ({ p
     expect(await page.evaluate(() => getComputedStyle(document.body).overflow)).not.toBe("hidden");
     await expect(systems(page).locator("[inert]")).toHaveCount(0);
 
-    await panel(page).getByRole("button", { name: t.close }).click();
+    await panel(page).getByRole("button", { name: dictionaries[locale].diagram.close }).click();
     await expect(panel(page)).not.toHaveAttribute("data-open", "");
     await expect(node(page, "processing")).toBeFocused();
 

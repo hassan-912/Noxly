@@ -33,7 +33,7 @@ export type FrameSize = {
 
 /**
  * A frosted device frame whose screen is exactly the device's CSS width, so whatever is inside
- * (a container-query demo, or an iframe) lays itself out for that device. When the stage is
+ * (a site panel, or an iframe) lays itself out for that device. When the stage is
  * narrower than the device, the whole frame is scaled down to fit and never overflows.
  *
  * With `size` null (before measuring, and on viewports below 768px) the frame is fluid: the

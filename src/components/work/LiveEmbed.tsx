@@ -2,14 +2,20 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Play } from "lucide-react";
-import type { Locale } from "@/content/types";
 import { cn } from "@/lib/cn";
-import { getDictionary } from "@/lib/i18n";
+import { useImageFailed } from "@/lib/use-image-failed";
+import type { Dictionary } from "@/content/i18n";
 
 /** If the live site isn't showing this long after the click, fall back to the poster. */
 const LOAD_TIMEOUT_MS = 8000;
 
 type State = "idle" | "loading" | "live" | "failed";
+
+/** The strings LiveEmbed shows, passed in so no dictionary reaches the client bundle. */
+export type LiveEmbedLabels = Pick<
+  Dictionary["viewer"],
+  "loadLive" | "liveTitle" | "liveLoading" | "livePoster" | "liveFallback" | "openWebsite" | "opensNewTab"
+>;
 
 /**
  * A live site, loaded only after a click. Until then (and whenever loading fails) it shows the
@@ -21,7 +27,8 @@ type State = "idle" | "loading" | "live" | "failed";
  * tells "reachable" from "down". If the probe fails, or the frame hasn't loaded within about
  * 8 seconds, the iframe is removed and the poster returns with a short explanation.
  *
- * It fills the width of its container, so a device frame around it changes the iframe's width.
+ * It fills the width of its container, so a device frame around it changes the iframe's width
+ * (`live-embed--framed` makes it fill the frame's screen instead of keeping its own card shape).
  *
  * Focus: the button goes away once loading starts, so focus moves to the embed itself (which
  * announces the loading or fallback message) and on to the iframe once the site is showing.
@@ -32,25 +39,35 @@ export function LiveEmbed({
   poster,
   title,
   pitch,
-  locale,
+  labels: t,
   className,
 }: {
   url: string;
-  /** Path of the captured screenshot, or null when there is none. */
+  /** Path of the real screenshot of the site, or null when there is none. */
   poster: string | null;
   /** The project's name. */
   title: string;
   /** Shown on the fallback card. */
   pitch?: string;
-  locale: Locale;
+  labels: LiveEmbedLabels;
   className?: string;
 }) {
-  const t = getDictionary(locale).viewer;
   const [state, setState] = useState<State>("idle");
-  const [posterBroken, setPosterBroken] = useState(false);
+  const { failed: posterBroken, imgProps: posterProps } = useImageFailed(poster);
   const progress = useRef({ probed: false, framed: false });
   const figure = useRef<HTMLElement>(null);
   const frame = useRef<HTMLIFrameElement>(null);
+
+  // Public sites load as the visitor reaches them, matching the work gallery's live preview.
+  useEffect(() => {
+    const el = figure.current;
+    if (!el || state !== "idle") return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) setState("loading");
+    }, { rootMargin: "160px" });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [state]);
 
   const load = () => {
     setState("loading");
@@ -107,7 +124,7 @@ export function LiveEmbed({
       <div className="live-embed__screen">
         {showPoster &&
           (poster && !posterBroken ? (
-            // A static export serves images as they are; next/image would add nothing here.
+            // Images are served unoptimized (next.config.ts); next/image would add nothing here.
             // eslint-disable-next-line @next/next/no-img-element
             <img
               data-live-poster="image"
@@ -117,7 +134,7 @@ export function LiveEmbed({
               height={900}
               loading="lazy"
               decoding="async"
-              onError={() => setPosterBroken(true)}
+              {...posterProps}
               className="absolute inset-0 size-full object-cover object-top"
             />
           ) : (
@@ -177,7 +194,7 @@ export function LiveEmbed({
           rel="noopener noreferrer"
           className="group inline-flex min-h-8 items-center gap-1.5 rounded-sm text-sm font-medium text-ink transition-colors duration-200 hover:text-indigo focus-visible:text-indigo"
         >
-          {t.visitSite}
+          {t.openWebsite}
           <span className="sr-only"> {t.opensNewTab}</span>
           <ArrowUpRight
             aria-hidden="true"

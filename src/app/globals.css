@@ -13,11 +13,6 @@
   --color-teal: #4ab5b5;
   --color-teal-text: #2c7f80;
   --color-sky: #8fd9fb;
-
-  /* Container-query breakpoints of the coded demos: @d1, @d2, @d3. */
-  --container-d1: 420px;
-  --container-d2: 760px;
-  --container-d3: 920px;
 }
 
 html {
@@ -28,6 +23,14 @@ body {
   background: var(--color-surface);
   color: var(--color-ink);
   font-family: var(--font-sans);
+}
+
+/* Quiet page texture; section and card surfaces keep their existing colours. */
+@layer components {
+  .site-dots {
+    background-image: radial-gradient(circle at 1px 1px, rgb(92 126 143 / 0.12) 0.7px, transparent 1px);
+    background-size: 1.5rem 1.5rem;
+  }
 }
 
 /* Arabic pages: Arabic glyphs from IBM Plex Sans Arabic, Latin (tech names, numbers) from Geist.
@@ -172,7 +175,7 @@ body {
     }
   
     /* 520ms per word; StaggerHeadline spaces the delays so the whole reveal stays under 1s. */
-    .hero-word {
+    .hero-word:not([data-first]) {
       animation: hero-word-in 520ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
       animation-delay: var(--word-delay, 0ms);
     }
@@ -234,8 +237,8 @@ body {
       0 10px 24px -10px rgb(82 90 255 / 0.55);
   }
   
-  /* Composition: drawn in design pixels (`--u`) that scale with the column, so the screens keep
-     their proportions at every width. Tailwind spacing inside the stage is in the same unit. */
+  /* Composition: drawn in design pixels (`--u`) that scale with the column, so the screenshots
+     keep their proportions at every width. Tailwind spacing inside the stage is in the same unit. */
   .hero-comp {
     container-type: inline-size;
     --hc-w: 540;
@@ -285,24 +288,41 @@ body {
     will-change: transform;
   }
   
+  /* Each screen: a slim bar with the project's name above its real screenshot. */
+  .hero-screen__bar {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--u) * 7);
+    padding: calc(var(--u) * 8) calc(var(--u) * 12);
+    border-block-end: 1px solid rgb(212 221 226 / 0.8);
+  }
+
+  .hero-screen__dot {
+    flex: none;
+    inline-size: calc(var(--u) * 6);
+    block-size: calc(var(--u) * 6);
+    border-radius: 50%;
+    background: var(--color-indigo);
+  }
+
+  .hero-screen__img {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    background: var(--color-frost);
+  }
+
   .hc-title {
+    min-inline-size: 0;
     font-size: calc(var(--u) * 11.5);
     font-weight: 600;
     letter-spacing: -0.01em;
   }
-  
-  .hc-label {
-    font-size: calc(var(--u) * 10);
-  }
-  
-  .hc-small {
-    font-size: calc(var(--u) * 8.75);
-  }
-  
+
   .locale-ar .hc-title {
     letter-spacing: 0;
   }
-  
+
   .hero-comp__caption {
     display: flex;
     align-items: center;
@@ -325,81 +345,6 @@ body {
       --p: 1 !important;
     }
   }
-}
-
-/* ───────────────────────── Coded demos (sample data) ───────────────────────── */
-
-@layer components {
-  /* One calm product family: frost body, white panels, hairlines. The root is a size container
-     (Tailwind @container), so layouts follow the frame's width, not the viewport's. */
-  .demo {
-    background: var(--color-frost);
-    color: var(--color-ink);
-    font-size: 0.8125rem;
-    line-height: 1.45;
-    text-align: start;
-  }
-
-  .locale-ar .demo {
-    font-size: 0.875rem;
-    line-height: 1.6;
-  }
-
-  /* Small labels: mono for Latin scripts, the text face for Arabic (mono has no Arabic glyphs). */
-  .demo-kicker {
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    line-height: 1.4;
-  }
-
-  .locale-ar .demo-kicker,
-  [lang=ar] .demo-kicker {
-    font-family: inherit;
-    font-size: 0.75rem;
-  }
-
-  /* Illustrative phone. Drawn in design pixels (--u = 1/280 of its width) so it keeps its
-     proportions at any size; Tailwind spacing inside is in the same unit. */
-  .demo-phone {
-    container-type: inline-size;
-    inline-size: 100%;
-    max-inline-size: 17.5rem;
-    aspect-ratio: 280 / 572;
-    margin: 0;
-  }
-
-  .demo-phone__body {
-    --u: calc(100cqi / 280);
-    --spacing: calc(var(--u) * 4);
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    block-size: 100%;
-    overflow: hidden;
-    border: calc(var(--u) * 7) solid var(--color-ink);
-    border-radius: calc(var(--u) * 40);
-    background: var(--color-frost);
-    color: var(--color-ink);
-    font-size: calc(var(--u) * 12);
-    line-height: 1.35;
-    text-align: start;
-    box-shadow:
-      0 1px 1px rgb(14 26 36 / 0.05),
-      0 calc(var(--u) * 12) calc(var(--u) * 26) calc(var(--u) * -12) rgb(14 26 36 / 0.18),
-      0 calc(var(--u) * 36) calc(var(--u) * 60) calc(var(--u) * -30) rgb(14 26 36 / 0.28);
-  }
-
-  [lang=ar] .demo-phone__body {
-    line-height: 1.55;
-  }
-
-  .mp-t1 { font-size: calc(var(--u) * 9.5); }
-  .mp-t2 { font-size: calc(var(--u) * 11); }
-  .mp-t3 { font-size: calc(var(--u) * 12.5); }
-  .mp-t4 { font-size: calc(var(--u) * 15); }
-  .mp-t5 { font-size: calc(var(--u) * 19); }
-  .mp-r1 { border-radius: calc(var(--u) * 8); }
-  .mp-r2 { border-radius: calc(var(--u) * 14); }
 }
 
 /* ───────────────────────── Shared surfaces ───────────────────────── */
@@ -497,7 +442,7 @@ body {
   @media (min-width: 48rem) {
     .viewer-stage {
       border: 1px solid var(--color-mist);
-      border-radius: 1.75rem;
+      border-radius: 0 1rem 1rem 1rem;
     }
   }
 
@@ -642,8 +587,16 @@ body {
     opacity: 1;
   }
 
-  /* Crossfade between projects: the outgoing demo is laid over the incoming one and fades. */
-  .viewer-demo--out {
+  /* Crossfade between projects: the outgoing panel is laid over the incoming one and fades. */
+  .viewer-panel {
+    min-block-size: 100%;
+  }
+
+  .device-frame:not([data-fluid]) .viewer-panel {
+    block-size: 100%;
+  }
+
+  .viewer-panel--out {
     position: absolute;
     inset: 0;
     z-index: 1;
@@ -664,13 +617,95 @@ body {
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .viewer-demo {
+    .viewer-panel {
       animation: viewer-in 280ms ease both;
     }
 
-    .viewer-demo--out {
+    .viewer-panel--out {
       animation: viewer-out 280ms ease both;
     }
+  }
+
+  /* ── SitePanel: the live site, a real screenshot, or a text presentation ── */
+
+  /* It fills the frame's screen; in the fluid phone layout (below 768px) it brings its own height. */
+  .site-panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    container-type: inline-size;
+    min-block-size: 100%;
+    background: var(--color-frost);
+  }
+
+  .device-frame:not([data-fluid]) .site-panel {
+    block-size: 100%;
+  }
+
+  .site-panel--shot {
+    margin: 0;
+    overflow: clip;
+  }
+
+  .device-frame[data-fluid] .site-panel--shot {
+    min-block-size: 36rem;
+  }
+
+  .site-panel__image {
+    position: relative;
+    flex: 1;
+    min-block-size: 16rem;
+  }
+
+  /* The capture fills the screen from the top; the page's start is what matters. */
+  .site-panel__shot {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    object-position: top center;
+  }
+
+  .site-panel__overlay {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--color-surface);
+    border-block-start: 1px solid var(--color-mist);
+    flex-shrink: 0;
+  }
+
+  .site-panel__note {
+    max-inline-size: 30rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: 0.875rem;
+    background: rgb(255 255 255 / 0.94);
+    font-size: 0.875rem;
+    line-height: 1.45;
+    text-align: center;
+    text-wrap: pretty;
+    color: var(--color-ink);
+    box-shadow:
+      0 1px 2px rgb(14 26 36 / 0.12),
+      0 12px 28px -14px rgb(14 26 36 / 0.35);
+  }
+
+  /* No screenshot: name, pitch, the honest note and the one useful link. Never an empty frame. */
+  .site-panel--text {
+    justify-content: center;
+    min-block-size: 24rem;
+    background:
+      radial-gradient(34rem 20rem at 92% 0%, rgb(143 217 251 / 0.4), transparent 62%),
+      radial-gradient(30rem 22rem at 0% 100%, rgb(207 202 255 / 0.45), transparent 62%),
+      var(--color-frost);
+  }
+
+  .site-panel__text {
+    padding: clamp(1.5rem, 7cqi, 4rem);
   }
 
   /* ── LiveEmbed ── */
@@ -707,6 +742,27 @@ body {
       radial-gradient(30rem 22rem at 0% 100%, rgb(207 202 255 / 0.5), transparent 62%),
       radial-gradient(24rem 16rem at 70% 110%, rgb(255 211 189 / 0.45), transparent 62%),
       var(--color-frost);
+  }
+
+  /* Inside a device frame it fills the screen: the frame is the card. */
+  .live-embed--framed {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .live-embed--framed .live-embed__screen {
+    flex: 1;
+    aspect-ratio: auto;
+    min-block-size: 0;
+    max-block-size: none;
+  }
+
+  .device-frame[data-fluid] .live-embed--framed .live-embed__screen {
+    flex: none;
+    aspect-ratio: 390 / 700;
   }
 
   .live-embed__overlay {

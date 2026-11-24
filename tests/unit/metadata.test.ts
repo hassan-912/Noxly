@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { locales } from "@/content/types";
+import { dictionaries } from "@/content/i18n";
 import { site } from "@/content/site";
 import { buildMetadata } from "@/lib/metadata";
 import { localizePath } from "@/lib/i18n";
@@ -17,8 +18,8 @@ describe("metadata", () => {
       ar: `${site.url}/ar/`,
       "x-default": `${site.url}/en/`,
     });
-    expect(meta.title).toBe("Hassan Azab — Software Engineer");
-    expect(meta.description).toMatch(/software engineer at MG Visa/);
+    expect(meta.title).toBe(dictionaries.de.meta.title);
+    expect(meta.description).toBe(dictionaries.de.meta.description);
     expect(meta.metadataBase?.toString()).toBe(`${site.url}/`);
   });
 
@@ -38,15 +39,15 @@ describe("metadata", () => {
     expect(meta.openGraph).toMatchObject({ url: `${site.url}/ar/work/review/`, locale: "ar_EG" });
   });
 
-  test("sitemap lists 4 home URLs and 16 case-study URLs", () => {
+  test("sitemap lists home, systems, notes and case-study URLs in each locale", () => {
     const urls = sitemap().map((e) => e.url).sort();
     const caseStudies = ["review", "calculator", "consultation", "mg-mobile"];
     const expected = locales
-      .flatMap((l) => [`${site.url}/${l}/`, ...caseStudies.map((s) => `${site.url}/${l}/work/${s}/`)])
+      .flatMap((l) => [`${site.url}/${l}/`, `${site.url}/${l}/systems/`, `${site.url}/${l}/notes/`, ...caseStudies.map((s) => `${site.url}/${l}/work/${s}/`)])
       .sort();
-    expect(urls).toHaveLength(20);
+    expect(urls).toHaveLength(28);
     expect(urls).toEqual(expected);
-    expect(urls.some((u) => u.includes("demo-lab"))).toBe(false);
+    expect(urls.some((u) => u.includes("demo-lab") || u.includes("e2e-fixtures"))).toBe(false);
   });
 
   test("robots allows crawling and points to the sitemap", () => {

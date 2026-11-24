@@ -1,9 +1,10 @@
-import { untranslated, type Project } from "./types";
+import type { Project } from "./types";
+import { localized } from "./localized";
 
 /**
  * Every project on the site. Facts come only from docs/brief.md and the design spec.
  * Pitches and the Crew-MG paragraph are the brief's wording, verbatim.
- * TODO(task 11): replace each `untranslated(...)` with real de/fr/ar text.
+ * `localized(...)` resolves each public string through the checked-in locale maps.
  */
 export const projects: Project[] = [
   {
@@ -11,14 +12,14 @@ export const projects: Project[] = [
     tier: "featured",
     order: 1,
     repo: "https://github.com/hassan-912/Review-Project",
-    liveUrl: null,
-    embeddable: false,
-    demo: "review",
+    liveUrl: "https://mg-visa-review.streamlit.app/",
+    embed: "allowed",
+    screenshots: null,
     stack: ["python", "streamlit", "pydantic", "supabase", "pymupdf", "ocr", "pdf-reporting", "gemini"],
     status: ["internal-tool"],
     authorship: { kind: "solo" },
     caseStudy: true,
-    text: untranslated({
+    text: localized({
       name: "MG Visa Document Review",
       pitch: "Make every detail easier to check.",
       summary:
@@ -48,14 +49,24 @@ export const projects: Project[] = [
     tier: "featured",
     order: 2,
     repo: "https://github.com/hassan-912/Visa-File-Strength-Calculator",
-    liveUrl: null,
-    embeddable: false,
-    demo: "calculator",
+    // Live, but its CSP sends frame-ancestors 'none' (and X-Frame-Options: DENY): never embedded.
+    liveUrl: "https://visa-file-strength-calculator.vercel.app",
+    embed: "blocked-by-site",
+    previews: [
+      { id: "tourism", label: { en: "Tourism", de: "Tourismus", fr: "Tourisme", ar: "السياحة" }, liveUrl: "https://visa-file-strength-calculator.vercel.app/", screenshots: { desktop: "/screens/calculator-desktop.webp", mobile: "/screens/calculator-mobile.webp", alt: localized("Tourism Visa File Strength Calculator") } },
+      { id: "immigration", label: { en: "Immigration", de: "Einwanderung", fr: "Immigration", ar: "الهجرة" }, liveUrl: "https://visa-file-strength-calculator.vercel.app/immigration/", screenshots: { desktop: "/screens/calculator-immigration-desktop.webp", mobile: "/screens/calculator-immigration-mobile.webp", alt: localized("Immigration calculator for Canada and Australia") } },
+      { id: "jobseeker", label: { en: "Jobseeker", de: "Arbeitssuche", fr: "Recherche d’emploi", ar: "البحث عن عمل" }, liveUrl: "https://visa-file-strength-calculator.vercel.app/job-seeker/", screenshots: { desktop: "/screens/calculator-jobseeker-desktop.webp", mobile: "/screens/calculator-jobseeker-mobile.webp", alt: localized("Jobseeker portal for Germany, Austria and Sweden") } },
+    ],
+    screenshots: {
+      desktop: "/screens/calculator-desktop.webp",
+      mobile: "/screens/calculator-mobile.webp",
+      alt: localized("The public start page of MG Visa Calculator"),
+    },
     stack: ["typescript", "nextjs", "react", "tailwind", "exchangerate-api", "anabin"],
     status: ["internal-tool"],
     authorship: { kind: "solo" },
     caseStudy: true,
-    text: untranslated({
+    text: localized({
       name: "MG Visa Calculator",
       pitch: "Turn complicated questions into a clearer starting point.",
       summary:
@@ -85,10 +96,14 @@ export const projects: Project[] = [
     tier: "featured",
     order: 3,
     repo: "https://github.com/hassan-912/consultatioin",
-    // Live, but sends X-Frame-Options: DENY, so it is linked externally and never embedded.
+    // Live, but sends X-Frame-Options: DENY and frame-ancestors 'none': never embedded.
     liveUrl: "https://consultatioin.vercel.app",
-    embeddable: false,
-    demo: "consultation",
+    embed: "blocked-by-site",
+    screenshots: {
+      desktop: "/screens/consultation-desktop.webp",
+      mobile: "/screens/consultation-mobile.webp",
+      alt: localized("The public start page of MG Consultation"),
+    },
     stack: [
       "typescript", "react", "vite", "tailwind", "zustand", "framer-motion", "supabase", "postgresql",
       "supabase-auth", "supabase-storage", "supabase-edge-functions", "easykash", "resend",
@@ -96,7 +111,7 @@ export const projects: Project[] = [
     status: ["public-site"],
     authorship: { kind: "solo" },
     caseStudy: true,
-    text: untranslated({
+    text: localized({
       name: "MG Consultation",
       pitch: "A clearer journey from first booking to follow-up.",
       summary:
@@ -128,13 +143,13 @@ export const projects: Project[] = [
     order: 4,
     repo: null,
     liveUrl: null,
-    embeddable: false,
-    demo: "mg-mobile",
+    embed: "no-public-url",
+    screenshots: null,
     stack: ["flutter", "dart", "riverpod", "gorouter", "dio", "supabase"],
     status: ["in-development", "not-released"],
     authorship: { kind: "solo" },
     caseStudy: true,
-    text: untranslated({
+    text: localized({
       name: "MG Mobile",
       pitch: "Bringing the MG experience into your hand.",
       summary:
@@ -165,13 +180,13 @@ export const projects: Project[] = [
     order: 5,
     repo: "https://github.com/hassan-912/Crew-MG",
     liveUrl: null,
-    embeddable: false,
-    demo: "crew-mg",
+    embed: "no-public-url",
+    screenshots: null,
     stack: ["nextjs", "react", "typescript", "tailwind", "supabase", "postgresql"],
     status: ["internal-tool", "in-development"],
     authorship: { kind: "solo" },
     caseStudy: false,
-    text: untranslated({
+    text: localized({
       name: "Crew-MG",
       // The brief's wording, verbatim. Security is an ongoing requirement, never presented as finished.
       pitch: "Company knowledge, with controlled access from the start.",
@@ -190,13 +205,13 @@ export const projects: Project[] = [
     order: 6,
     repo: "https://github.com/hassan-912/mawe-ed",
     liveUrl: null,
-    embeddable: false,
-    demo: null,
+    embed: "no-public-url",
+    screenshots: null,
     stack: ["javascript", "pwa", "cloudflare-workers", "d1", "cron-triggers", "web-push"],
     status: [],
     authorship: { kind: "solo" },
     caseStudy: false,
-    text: untranslated({
+    text: localized({
       name: "Mawid Reminders",
       pitch: "Keep the next important step in sight.",
       summary:
@@ -210,43 +225,18 @@ export const projects: Project[] = [
     }),
   },
   {
-    slug: "qr-studio",
-    tier: "further",
-    order: 7,
-    repo: "https://github.com/hassan-912/queue-r-code-",
-    liveUrl: "https://queue-r-code.vercel.app",
-    embeddable: true,
-    demo: null,
-    stack: ["nextjs", "react", "typescript", "tailwind", "framer-motion", "supabase", "qr-code-styling"],
-    status: ["public-site"],
-    authorship: { kind: "solo" },
-    caseStudy: false,
-    text: untranslated({
-      name: "QR Studio / Dynamic Bio",
-      pitch: "One scan. A more useful connection.",
-      summary:
-        "Customized QR-code creation and personal link pages, including visual styling, downloadable assets, and engagement tracking.",
-      features: [
-        "QR codes with custom visual styling",
-        "Downloadable QR assets",
-        "Personal link pages",
-        "Engagement tracking",
-      ],
-    }),
-  },
-  {
     slug: "voclio",
     tier: "further",
     order: 8,
     repo: null,
     liveUrl: null,
-    embeddable: false,
-    demo: null,
+    embed: "no-public-url",
+    screenshots: null,
     stack: ["nodejs", "typescript", "nextjs", "github", "vercel"],
     status: ["graduation-project", "team-project"],
-    authorship: { kind: "shared", note: untranslated("Graduation project with a team of eight") },
+    authorship: { kind: "shared", note: localized("Graduation project with a team of eight") },
     caseStudy: false,
-    text: untranslated({
+    text: localized({
       name: "Voclio",
       pitch: "Exploring voice-to-productivity workflows.",
       summary:
@@ -258,17 +248,27 @@ export const projects: Project[] = [
   },
   {
     slug: "femine-eg",
-    tier: "further",
+    tier: "featured",
     order: 9,
     repo: null,
-    liveUrl: null,
-    embeddable: false,
-    demo: null,
+    liveUrl: "https://femine-eg.com/",
+    // Shopify sends X-Frame-Options: DENY and CSP frame-ancestors 'none'.
+    embed: "blocked-by-site",
+    screenshots: {
+      desktop: "/screens/femine-eg-desktop.webp",
+      mobile: "/screens/femine-eg-mobile.webp",
+      alt: {
+        en: "The public home page of Femine-EG",
+        de: "Die öffentliche Startseite von Femine-EG",
+        fr: "La page d’accueil publique de Femine-EG",
+        ar: "الصفحة الرئيسية العامة لموقع Femine-EG",
+      },
+    },
     stack: ["shopify"],
-    status: [],
+    status: ["public-site"],
     authorship: { kind: "solo" },
     caseStudy: false,
-    text: untranslated({
+    text: localized({
       name: "Femine-EG",
       pitch: "A Shopify store, developed and maintained.",
       summary:
@@ -281,34 +281,24 @@ export const projects: Project[] = [
     order: 10,
     repo: null,
     liveUrl: null,
-    embeddable: false,
-    demo: null,
+    embed: "no-public-url",
+    screenshots: null,
     stack: ["python"],
     status: [],
     authorship: { kind: "solo" },
     caseStudy: false,
-    text: untranslated({
+    text: localized({
       name: "Treasure Hunt AI Game",
       pitch: "Search algorithms, played out on a grid.",
       summary: "A Python project exploring A* and Greedy Search through a grid-based treasure hunt.",
     }),
   },
-  {
-    slug: "muscle-generator",
-    tier: "further",
-    order: 11,
-    repo: "https://github.com/hassan-912/grow-muscle",
-    liveUrl: null,
-    embeddable: false,
-    demo: null,
-    stack: ["javascript", "tailwind"],
-    status: ["team-project"],
-    authorship: { kind: "shared", note: untranslated("Built with a team") },
-    caseStudy: false,
-    text: untranslated({
-      name: "Muscle Generator",
-      pitch: "A fitness website, built as a team.",
-      summary: "A fitness website offering workout routines, nutrition information, and training tools.",
-    }),
-  },
+
 ];
+
+// Product and project names are proper names; translate the descriptions around them.
+for (const project of projects) {
+  for (const locale of ["de", "fr", "ar"] as const) {
+    project.text[locale].name = project.text.en.name;
+  }
+}

@@ -1,48 +1,36 @@
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import type { Dictionary } from "@/content/i18n";
+import type { Locale } from "@/content/types";
 import { site } from "@/content/site";
+import { getProject } from "@/lib/i18n";
+import { screenshotOf } from "@/components/work/site";
+import { sitePanelProject } from "@/components/work/site-props";
 import { Aurora } from "./Aurora";
-import { HeroComposition, type HeroCompositionLabels } from "./HeroComposition";
+import { HeroComposition, type HeroScreen } from "./HeroComposition";
 import { StaggerHeadline } from "./StaggerHeadline";
+
+/** The screens of the composition, back to front: real captures of each live site's public page. */
+const HERO_SCREENS = [
+  { slug: "calculator", device: "desktop" },
+  { slug: "consultation", device: "desktop" },
+  { slug: "femine-eg", device: "desktop" },
+] as const;
 
 /**
  * Cinematic moment 1 (spec §9): an asymmetric split with the introduction at the start side and
- * a layered product composition at the end side, over a slow pastel aurora. Everything is in the
- * static HTML and readable at once; motion is an enhancement and is removed under reduced motion.
+ * layered screenshots of real projects at the end side, over a slow pastel aurora. Everything is
+ * in the static HTML and readable at once; motion is an enhancement and is removed under reduced
+ * motion.
  */
-export function Hero({ dict }: { dict: Dictionary }) {
+export function Hero({ dict, locale }: { dict: Dictionary; locale: Locale }) {
   const t = dict.hero;
-  const { review, calculator, consultation } = dict.demos;
 
-  // Only the strings the composition shows cross into the client bundle.
-  const labels: HeroCompositionLabels = {
-    composition: t.compositionLabel,
-    demo: dict.demos.label,
-    review: {
-      title: review.title,
-      documentA: review.documentA,
-      documentB: review.documentB,
-      factualChecks: review.factualChecks,
-      aiAssisted: review.aiAssisted,
-      match: review.match,
-      discrepancy: review.discrepancy,
-    },
-    calculator: {
-      title: calculator.title,
-      pathway: calculator.pathway,
-      tourism: calculator.tourism,
-      immigration: calculator.immigration,
-      jobSeeker: calculator.jobSeeker,
-      fundingCheck: calculator.fundingCheck,
-      result: calculator.result,
-    },
-    consultation: {
-      title: consultation.title,
-      chooseSlot: consultation.chooseSlot,
-      confirm: consultation.confirm,
-      ticket: consultation.ticket,
-    },
-  };
+  // Only what the composition shows crosses into the client bundle.
+  const screens: HeroScreen[] = HERO_SCREENS.flatMap(({ slug, device }) => {
+    const project = sitePanelProject(getProject(slug), locale);
+    const shot = screenshotOf(project, device);
+    return shot ? [{ name: project.name, src: shot.src, alt: shot.alt, width: shot.width, height: shot.height }] : [];
+  });
 
   return (
     <section aria-labelledby="hero-title" className="relative isolate overflow-clip">
@@ -83,7 +71,7 @@ export function Hero({ dict }: { dict: Dictionary }) {
             </a>
           </div>
         </div>
-        <HeroComposition labels={labels} className="lg:-me-4 xl:-me-10" />
+        <HeroComposition screens={screens} caption={t.compositionLabel} className="lg:-me-4 xl:-me-10" />
       </div>
     </section>
   );

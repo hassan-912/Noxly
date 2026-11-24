@@ -6,6 +6,7 @@ import { Menu, X } from "lucide-react";
 import { locales, type Locale } from "@/content/types";
 import { localizePath } from "@/lib/i18n";
 import type { NavLink } from "./nav";
+import { FlagIcon } from "./FlagIcon";
 
 interface Props {
   locale: Locale;
@@ -131,7 +132,8 @@ export function MobileNav({ locale, links, names, whatsappHref, labels }: Props)
                     aria-current={l === locale ? "true" : undefined}
                     className="flex min-h-11 items-center rounded-lg px-3 text-base text-ink hover:bg-frost aria-[current]:bg-frost aria-[current]:font-semibold"
                   >
-                    {names[l]}
+                    <FlagIcon locale={l} />
+                    <span className="ms-2">{names[l]}</span>
                   </a>
                 </li>
               ))}

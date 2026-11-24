@@ -4,7 +4,6 @@ import type { KeyboardEvent } from "react";
 import type { Locale, ProjectSlug, StatusKey } from "@/content/types";
 import { cn } from "@/lib/cn";
 import { GlowSurface } from "@/components/ui/GlowSurface";
-import { StatusPill } from "@/components/ui/StatusPill";
 
 export type RailItem = {
   slug: ProjectSlug;
@@ -26,7 +25,6 @@ export const panelId = (idBase: string) => `${idBase}-panel`;
 export function ProjectRail({
   idBase,
   label,
-  locale,
   items,
   active,
   onSelect,
@@ -61,7 +59,7 @@ export function ProjectRail({
       role="tablist"
       aria-label={label}
       onKeyDown={onKeyDown}
-      className="viewer-rail -mx-5 flex gap-2 overflow-x-auto px-5 pt-1 pb-6 -mb-5 sm:-mx-8 sm:px-8 md:mx-0 md:mb-0 md:grid md:grid-cols-3 md:overflow-visible md:p-0 lg:flex lg:flex-col lg:gap-1.5"
+      className="viewer-rail flex min-w-0 gap-1 overflow-x-auto px-1 pt-1"
     >
       {items.map((item, i) => {
         const selected = i === active;
@@ -77,13 +75,13 @@ export function ProjectRail({
             tabIndex={selected ? 0 : -1}
             onClick={() => onSelect(i)}
             className={cn(
-              "group flex w-[13.5rem] shrink-0 cursor-pointer flex-col items-start gap-2 rounded-2xl border p-4 text-start transition-[background-color,border-color,box-shadow] duration-300 md:w-auto",
+              "group flex min-h-12 shrink-0 cursor-pointer items-center gap-3 rounded-t-xl border border-b-0 px-5 py-3 text-start transition-colors",
               selected
-                ? "border-mist bg-surface shadow-[0_1px_1px_rgb(14_26_36/0.04),0_14px_28px_-18px_rgb(14_26_36/0.28)]"
+                ? "border-mist bg-frost"
                 : "border-transparent hover:border-mist/70 hover:bg-frost/70",
             )}
           >
-            <span className="flex w-full items-center gap-2.5">
+            <span className="flex items-center gap-2.5">
               <span
                 className={cn(
                   "font-mono text-xs transition-colors duration-300",
@@ -92,13 +90,6 @@ export function ProjectRail({
               >
                 {item.number}
               </span>
-              <span
-                aria-hidden="true"
-                className={cn(
-                  "viewer-rail__rule h-px flex-1 transition-[background-color,scale] duration-500",
-                  selected ? "scale-x-100 bg-indigo/45" : "scale-x-50 bg-mist",
-                )}
-              />
             </span>
             <span
               className={cn(
@@ -108,9 +99,6 @@ export function ProjectRail({
             >
               {item.name}
             </span>
-            {item.status.map((key) => (
-              <StatusPill key={key} status={key} locale={locale} className={selected ? undefined : "bg-transparent"} />
-            ))}
           </GlowSurface>
         );
       })}

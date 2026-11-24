@@ -2,16 +2,15 @@ import { ArrowRight, ArrowUpRight, BookOpen, Globe } from "lucide-react";
 import type { ReactNode } from "react";
 import type { Locale, Project } from "@/content/types";
 import { getDictionary } from "@/lib/i18n";
-import { DemoLabel } from "@/components/demos/DemoLabel";
 import { GlowSurface } from "@/components/ui/GlowSurface";
 import { StatusPill } from "@/components/ui/StatusPill";
-import { GitHubMark, TechLabel } from "@/components/ui/TechLabel";
+import { TechLabel } from "@/components/ui/TechLabel";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
 /**
  * Everything the viewer says about one project: counter, name, pitch, summary, status, stack
- * (icon plus readable name), links and the demo label. A server component: the viewer receives
+ * (icon plus readable name) and links. A server component: the viewer receives
  * it already rendered, so the icon sets never reach the client bundle.
  *
  * It lays itself out by its own width (container query): one column beside the stage, two
@@ -88,19 +87,11 @@ export function ProjectInfo({
             )}
             {project.liveUrl && (
               <InfoLink href={project.liveUrl} external icon={<Globe aria-hidden="true" strokeWidth={1.75} />}>
-                {t.visitSite}
-                {newTab}
-              </InfoLink>
-            )}
-            {project.repo && (
-              <InfoLink href={project.repo} external icon={<GitHubMark />}>
-                {t.repo}
+                {t.openWebsite}
                 {newTab}
               </InfoLink>
             )}
           </ul>
-
-          {project.demo && <DemoLabel locale={locale} />}
         </div>
       </div>
     </article>

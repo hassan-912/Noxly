@@ -3,9 +3,6 @@
 import type { KeyboardEvent, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-// Its own module (re-exported by the demo kit) so a component can use the tabs without pulling
-// in the demos' dictionaries.
-
 /**
  * A segmented view switch with tab semantics: arrow keys (mirrored in RTL), Home and End move
  * and select; only the selected tab is in the tab order. Pair with `TabPanel` and the same `idBase`.

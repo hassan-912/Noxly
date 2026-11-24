@@ -2,10 +2,11 @@
 
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { usePathname } from "next/navigation";
-import { Check, ChevronDown, Globe } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import { locales, type Locale } from "@/content/types";
 import { localizePath } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
+import { FlagIcon } from "./FlagIcon";
 
 interface Props {
   locale: Locale;
@@ -107,7 +108,7 @@ export function LanguageMenu({ locale, label, names }: Props) {
         onKeyDown={onButtonKeyDown}
         className="inline-flex min-h-10 items-center gap-1.5 rounded-full px-3 text-sm font-medium text-ink-muted transition-colors hover:bg-frost hover:text-ink aria-expanded:bg-frost aria-expanded:text-ink"
       >
-        <Globe aria-hidden className="size-4" />
+        <FlagIcon locale={locale} />
         <span className="sr-only">{label}: </span>
         <span lang={locale}>{names[locale]}</span>
         <ChevronDown aria-hidden className={cn("size-4 transition-transform", open && "rotate-180")} />
@@ -134,7 +135,7 @@ export function LanguageMenu({ locale, label, names }: Props) {
               aria-current={l === locale ? "true" : undefined}
               className="flex min-h-10 items-center justify-between gap-4 rounded-lg px-3 text-sm text-ink hover:bg-frost focus-visible:bg-frost aria-[current]:font-semibold"
             >
-              {names[l]}
+              <span className="flex items-center gap-2"><FlagIcon locale={l} />{names[l]}</span>
               {l === locale && <Check aria-hidden className="size-4 text-indigo" />}
             </a>
           </li>

@@ -36,12 +36,6 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
               {newTab}
             </a>
           </li>
-          <li>
-            <a href={contacts.github} {...external} className={linkClass}>
-              {dict.contact.github}
-              {newTab}
-            </a>
-          </li>
         </ul>
       </div>
       <div className="border-t border-mist">

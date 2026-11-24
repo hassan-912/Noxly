@@ -41,7 +41,7 @@ function personJsonLd(locale: Locale): string {
       addressRegion: "Cairo",
       addressCountry: "EG",
     },
-    sameAs: [site.contacts.linkedin, site.contacts.github],
+    sameAs: [site.contacts.linkedin],
   };
   // Escape "<" so the JSON can never close the script element.
   return JSON.stringify(person).replace(/</g, "\\u003c");
@@ -60,7 +60,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
       <body>
         <SkipLink label={dict.nav.skipToContent} />
         <Header locale={locale} dict={dict} />
-        <main id="main" tabIndex={-1} className="focus:outline-none">
+        <main id="main" tabIndex={-1} className="site-dots focus:outline-none">
           {children}
         </main>
         <Footer locale={locale} dict={dict} />

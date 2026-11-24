@@ -7,7 +7,7 @@ import { navLinks } from "./nav";
 
 /**
  * Sticky frosted header. At `lg` and up: wordmark, section anchors, language menu, "Let's talk".
- * Below `lg` the anchors move into the MobileNav sheet (seven anchors do not fit at 768px);
+ * Below `xl` the anchors move into the MobileNav sheet;
  * below `md` the language menu and CTA move there too.
  */
 export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
@@ -24,8 +24,8 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
         >
           {site.name}
         </a>
-        <nav aria-label={dict.nav.label} className="hidden min-w-0 flex-1 lg:block">
-          <ul className="flex items-center justify-center gap-5 text-sm">
+        <nav aria-label={dict.nav.label} className="hidden min-w-0 flex-1 xl:block">
+          <ul className="flex items-center justify-center gap-4 text-[0.8125rem] 2xl:gap-5 2xl:text-sm">
             {links.map((link) => (
               <li key={link.id}>
                 <a
@@ -38,7 +38,7 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
             ))}
           </ul>
         </nav>
-        <div className="ms-auto flex shrink-0 items-center gap-2 lg:ms-0">
+        <div className="ms-auto flex shrink-0 items-center gap-2 xl:ms-0">
           <div className="hidden md:block">
             <LanguageMenu locale={locale} label={dict.language.label} names={names} />
           </div>
@@ -51,7 +51,7 @@ export function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
             {dict.nav.letsTalk}
             <span className="sr-only"> {dict.viewer.opensNewTab}</span>
           </a>
-          <div className="lg:hidden">
+          <div className="xl:hidden">
             <MobileNav
               locale={locale}
               links={links}

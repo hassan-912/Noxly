@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import path from "node:path";
 import { describe, expect, test } from "vitest";
 import * as simpleIcons from "simple-icons";
 import * as lucide from "lucide-react";
@@ -42,7 +44,7 @@ function englishStrings(value: unknown): string[] {
 
 const all: ProjectSlug[] = [
   "review", "calculator", "consultation", "mg-mobile", "crew-mg", "mawid",
-  "qr-studio", "voclio", "femine-eg", "treasure-hunt", "muscle-generator",
+  "voclio", "femine-eg", "treasure-hunt",
 ];
 
 describe("dictionaries", () => {
@@ -65,10 +67,23 @@ describe("dictionaries", () => {
     expect(en.hero.headline).toBe("Software that makes work feel simpler.");
     expect(en.hero.headline).toContain(en.hero.scrambleWord);
     expect(en.hero.scrambleWord).toBe("simpler");
-    expect(en.demos.label).toBe("Illustrative demo · sample data");
+    expect(en.viewer.blockedNote).toBe("This site's security settings don't allow it to be shown inside another page.");
+    expect(en.viewer.openWebsite).toBe("Open website");
+    expect(en.viewer.internalNote).toBe("Internal tool — not publicly accessible");
     expect(en.diagram.caption).toBe("Illustrative animation — not live traffic");
     expect(en.building.mobileStatus).toBe("In development · not released");
     expect(en.footer.privacy).toBe("This site sets no cookies and no tracking.");
+  });
+
+  test("no demo or sample-data wording and no demos.* keys in any locale", () => {
+    for (const locale of locales) {
+      const dict = dictionaries[locale];
+      expect("demos" in dict, locale).toBe(false);
+      for (const v of leafValues(dict)) {
+        expect(v as string, locale).not.toMatch(/illustrative demo|sample data|sample applicant|coded demo/i);
+      }
+      expect(leafPaths(dict).some((p) => /(^|\.)demo/i.test(p)), `${locale}: a demo key`).toBe(false);
+    }
   });
 
   test("helpers: getDictionary, isLocale, dirOf", () => {
@@ -81,7 +96,7 @@ describe("dictionaries", () => {
 });
 
 describe("projects", () => {
-  test("all eleven projects exist with unique slugs and orders", () => {
+  test("all nine projects exist with unique slugs and orders", () => {
     expect(projects.map((p) => p.slug).sort()).toEqual([...all].sort());
     expect(new Set(projects.map((p) => p.order)).size).toBe(projects.length);
     for (const slug of all) expect(getProject(slug).slug).toBe(slug);
@@ -104,8 +119,8 @@ describe("projects", () => {
     }
   });
 
-  test("featured and case-study projects have every text field", () => {
-    for (const p of projects.filter((p) => p.tier === "featured" || p.caseStudy)) {
+  test("case-study projects have every text field", () => {
+    for (const p of projects.filter((p) => p.caseStudy)) {
       for (const locale of locales) {
         const t = p.text[locale];
         expect(t.problem?.trim(), p.slug).toBeTruthy();
@@ -124,11 +139,11 @@ describe("projects", () => {
     }
   });
 
-  test("featured tier is review, calculator, consultation in order; mg-mobile and crew-mg are in-development", () => {
-    expect(getProjects("featured").map((p) => p.slug)).toEqual(["review", "calculator", "consultation"]);
+  test("featured tier includes Femine-EG beside the live sites; mg-mobile and crew-mg are in-development", () => {
+    expect(getProjects("featured").map((p) => p.slug)).toEqual(["review", "calculator", "consultation", "femine-eg"]);
     expect(getProjects("in-development").map((p) => p.slug).sort()).toEqual(["crew-mg", "mg-mobile"]);
     expect(getProjects("further").map((p) => p.slug).sort()).toEqual(
-      ["femine-eg", "mawid", "muscle-generator", "qr-studio", "treasure-hunt", "voclio"],
+      ["mawid", "treasure-hunt", "voclio"],
     );
   });
 
@@ -138,30 +153,55 @@ describe("projects", () => {
     );
   });
 
-  test("liveUrl is null except qr-studio and consultation; embeddable only qr-studio", () => {
+  test("projects: live URLs and embed status match verified sites", () => {
     const live = Object.fromEntries(projects.filter((p) => p.liveUrl).map((p) => [p.slug, p.liveUrl]));
     expect(live).toEqual({
-      "qr-studio": "https://queue-r-code.vercel.app",
+      calculator: "https://visa-file-strength-calculator.vercel.app",
       consultation: "https://consultatioin.vercel.app",
+      "femine-eg": "https://femine-eg.com/",
+      review: "https://mg-visa-review.streamlit.app/",
     });
-    expect(projects.filter((p) => p.embeddable).map((p) => p.slug)).toEqual(["qr-studio"]);
+    expect(getProject("calculator").embed).toBe("blocked-by-site");
+    expect(getProject("consultation").embed).toBe("blocked-by-site");
+    expect(getProject("femine-eg").embed).toBe("blocked-by-site");
+    expect(getProject("review").embed).toBe("allowed");
+    for (const p of projects) {
+      expect(["allowed", "blocked-by-site", "no-public-url"], p.slug).toContain(p.embed);
+      // A project has a public URL exactly when its embed status isn't "no-public-url".
+      expect(p.liveUrl === null, p.slug).toBe(p.embed === "no-public-url");
+      expect("embeddable" in p, p.slug).toBe(false);
+      expect("demo" in p, p.slug).toBe(false);
+    }
   });
 
-  test("repo for muscle-generator is https://github.com/hassan-912/grow-muscle; voclio, femine-eg, treasure-hunt have no repo", () => {
-    expect(getProject("muscle-generator").repo).toBe("https://github.com/hassan-912/grow-muscle");
+  test("screenshots: live sites have desktop and mobile captures under /screens/ that exist", () => {
+    const withShots = projects.filter((p) => p.screenshots).map((p) => p.slug).sort();
+    expect(withShots).toEqual(["calculator", "consultation", "femine-eg"]);
+    for (const p of projects) {
+      if (!p.screenshots) continue;
+      const { desktop, mobile, alt } = p.screenshots;
+      expect(desktop, p.slug).toBe(`/screens/${p.slug}-desktop.webp`);
+      expect(mobile, p.slug).toBe(`/screens/${p.slug}-mobile.webp`);
+      for (const file of [desktop!, mobile!]) {
+        expect(existsSync(path.join(process.cwd(), "public", file)), file).toBe(true);
+      }
+      for (const locale of locales) expect(alt[locale].trim(), `${p.slug}.${locale}`).not.toBe("");
+    }
+  });
+
+  test("repos match the brief; voclio, femine-eg, treasure-hunt have no repo", () => {
     for (const slug of ["voclio", "femine-eg", "treasure-hunt"] as const) expect(getProject(slug).repo).toBeNull();
     expect(getProject("review").repo).toBe("https://github.com/hassan-912/Review-Project");
     expect(getProject("calculator").repo).toBe("https://github.com/hassan-912/Visa-File-Strength-Calculator");
     expect(getProject("consultation").repo).toBe("https://github.com/hassan-912/consultatioin");
     expect(getProject("crew-mg").repo).toBe("https://github.com/hassan-912/Crew-MG");
     expect(getProject("mawid").repo).toBe("https://github.com/hassan-912/mawe-ed");
-    expect(getProject("qr-studio").repo).toBe("https://github.com/hassan-912/queue-r-code-");
   });
 
-  test("voclio and muscle-generator authorship is shared; the other seven are solo", () => {
+  test("voclio authorship is shared; the other six are solo", () => {
     const shared = projects.filter((p) => p.authorship.kind === "shared").map((p) => p.slug).sort();
-    expect(shared).toEqual(["muscle-generator", "voclio"]);
-    for (const slug of ["review", "calculator", "consultation", "mg-mobile", "crew-mg", "mawid", "qr-studio"] as const) {
+    expect(shared).toEqual(["voclio"]);
+    for (const slug of ["review", "calculator", "consultation", "mg-mobile", "crew-mg", "mawid"] as const) {
       expect(getProject(slug).authorship.kind, slug).toBe("solo");
     }
     const voclio = getProject("voclio").authorship;
@@ -169,8 +209,8 @@ describe("projects", () => {
   });
 
   test("statuses are only those the brief or spec supports", () => {
-    expect(getProject("qr-studio").status).toEqual(["public-site"]);
-    for (const slug of ["mawid", "femine-eg", "treasure-hunt"] as const) expect(getProject(slug).status, slug).toEqual([]);
+    expect(getProject("femine-eg").status).toEqual(["public-site"]);
+    for (const slug of ["mawid", "treasure-hunt"] as const) expect(getProject(slug).status, slug).toEqual([]);
   });
 
   test("mg-mobile status includes in-development and not-released", () => {
@@ -179,12 +219,9 @@ describe("projects", () => {
     for (const p of projects) for (const s of p.status) expect(status[s], `${p.slug}: ${s}`).toBeDefined();
   });
 
-  test("demo ids belong to the private MG tools only", () => {
-    const withDemo = Object.fromEntries(projects.filter((p) => p.demo).map((p) => [p.slug, p.demo]));
-    expect(withDemo).toEqual({
-      review: "review", calculator: "calculator", consultation: "consultation",
-      "crew-mg": "crew-mg", "mg-mobile": "mg-mobile",
-    });
+  test("muscle-generator appears nowhere in the content", () => {
+    const everything = JSON.stringify([projects, dictionaries, tech, status, diagrams, story, services, site]);
+    expect(everything).not.toMatch(/muscle/i);
   });
 
   test("brief's pitches and Crew-MG wording are verbatim", () => {
@@ -194,7 +231,6 @@ describe("projects", () => {
     expect(pitch("consultation")).toBe("A clearer journey from first booking to follow-up.");
     expect(pitch("mg-mobile")).toBe("Bringing the MG experience into your hand.");
     expect(pitch("mawid")).toBe("Keep the next important step in sight.");
-    expect(pitch("qr-studio")).toBe("One scan. A more useful connection.");
     const crew = getProject("crew-mg").text.en;
     expect(crew.pitch).toBe("Company knowledge, with controlled access from the start.");
     expect(crew.summary).toBe(

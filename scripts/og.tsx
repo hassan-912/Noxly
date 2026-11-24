@@ -1,9 +1,8 @@
 /**
- * Writes one Open Graph / Twitter share image per locale to public/og/{locale}.png.
+ * Writes English, German and French Open Graph / Twitter share images to public/og/.
  *
- * Fallback for `app/[locale]/opengraph-image.tsx`: under `output: "export"` that route is
- * written as an extensionless file (`out/en/opengraph-image`) that static hosts serve without
- * an image Content-Type, which social crawlers may reject. Runs before `next build`.
+ * `buildMetadata` points og:image at these fixed paths, so each locale's share image is a plain
+ * PNG file served with an image Content-Type. Arabic uses a checked-in browser capture.
  */
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -15,6 +14,9 @@ import { ogImagePath, ogSize } from "../src/lib/metadata";
 async function main() {
   const publicDir = path.resolve(__dirname, "../public");
   for (const locale of locales) {
+    // Satori cannot shape this font's Arabic GSUB lookup; the checked-in Arabic PNG is
+    // captured with a browser by scripts/capture-ar-og.ts instead.
+    if (locale === "ar") continue;
     const file = path.join(publicDir, ogImagePath(locale));
     await mkdir(path.dirname(file), { recursive: true });
     const image = new ImageResponse(<OgCard locale={locale} />, ogSize);

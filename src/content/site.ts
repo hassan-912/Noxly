@@ -1,4 +1,5 @@
-import { untranslated, type Localized } from "./types";
+import type { Localized } from "./types";
+import { localized } from "./localized";
 
 export const site: {
   name: string;
@@ -16,7 +17,7 @@ export const site: {
   name: "Hassan Azab",
   // Placeholder until the domain is decided; `npm run build` warns while it is unchanged.
   url: "https://azab.dev",
-  location: untranslated("New Cairo, Cairo, Egypt"),
+  location: localized("New Cairo, Cairo, Egypt"),
   contacts: {
     whatsapp: { e164: "+201023174210", href: "https://wa.me/201023174210" },
     email: "hassanazb.56@gmail.com",
